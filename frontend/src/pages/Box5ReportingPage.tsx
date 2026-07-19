@@ -1,15 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Printer } from 'lucide-react'
+import { Printer, Construction } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
 import BoxRequirements from '../components/BoxRequirements'
 import { formatSAR } from '../utils/format'
 import type { StatementResponse, Note } from '../types'
-
-const STATEMENTS = [
-  { key: 'BS', label: 'Balance Sheet' },
-  { key: 'IS', label: 'Income Statement' },
-]
 
 const IFRS_TITLES: Record<string, string> = {
   BS: 'Statement of Financial Position',
@@ -41,18 +35,6 @@ function renderStatementHtml(title: string, data: StatementResponse): string {
 }
 
 export default function Box5ReportingPage() {
-  const [active, setActive] = useState('BS')
-  const [statement, setStatement] = useState<StatementResponse | null>(null)
-  const [notes, setNotes] = useState<Note[]>([])
-
-  useEffect(() => {
-    client.get(`/box5/statements/${active}`).then((res) => setStatement(res.data))
-  }, [active])
-
-  useEffect(() => {
-    client.get('/box5/notes').then((res) => setNotes(res.data))
-  }, [])
-
   async function printIFRS() {
     const [bs, is, notesRes, setupRes] = await Promise.all([
       client.get('/box5/statements/BS'),
@@ -104,66 +86,25 @@ export default function Box5ReportingPage() {
     <div>
       <Header
         title="5 · Financial Reporting"
-        subtitle="Assembled statements — every line traces back through the reports, GL, confirmations and documents. Figures will populate once the General Ledger module is developed."
+        subtitle="Assembled statements and notes — every line traces back through the reports, GL, confirmations and documents."
       />
 
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-2">
-          {STATEMENTS.map((s) => (
-            <button
-              key={s.key}
-              onClick={() => setActive(s.key)}
-              className={`rounded-lg px-3 py-1.5 text-sm ${
-                active === s.key ? 'bg-sky-600 text-white' : 'bg-white border border-slate-200 text-slate-600'
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
+      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-16 text-center">
+        <span className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 mb-4">
+          <Construction size={28} />
+        </span>
+        <div className="text-lg font-semibold text-slate-800 mb-1">Under development</div>
+        <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">
+          The financial statements and notes will populate here once the General Ledger module is
+          connected to the NAWRAS ERP. Meanwhile, the full IFRS-format statements can be produced with
+          one click.
+        </p>
         <button
           onClick={printIFRS}
-          className="flex items-center gap-1.5 rounded-lg bg-emerald-600 text-white text-sm px-4 py-1.5 hover:bg-emerald-700"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 text-white text-sm px-4 py-2 hover:bg-emerald-700"
         >
-          <Printer size={15} /> Print IFRS statements
+          <Printer size={16} /> One-click IFRS report printing
         </button>
-      </div>
-
-      {statement && (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 mb-6">
-          {Object.entries(statement.sections).map(([section, lines]) => (
-            <div key={section} className="mb-4">
-              <div className="text-xs font-medium text-slate-500 uppercase mb-2">{section}</div>
-              <table className="w-full text-sm">
-                <tbody>
-                  {lines.map((l, i) => (
-                    <tr key={l.id} className="border-b border-slate-100">
-                      <td className="py-2 pr-4 text-slate-400 w-10">{i + 1}</td>
-                      <td className="py-2 pr-4 text-slate-800">{l.line_item}</td>
-                      <td className="py-2 pr-4 text-right text-slate-300 w-40">—</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-          <div className="flex justify-between pt-2 border-t border-slate-200 font-semibold text-slate-900">
-            <span>Total</span>
-            <span className="text-slate-300">—</span>
-          </div>
-        </div>
-      )}
-
-      <div className="rounded-xl border border-slate-200 bg-white p-5">
-        <div className="text-sm font-semibold text-slate-800 mb-3">Notes & Disclosures</div>
-        <div className="space-y-3">
-          {notes.map((n, i) => (
-            <div key={n.title}>
-              <div className="text-sm font-medium text-slate-800">{i + 1} · {n.title}</div>
-              <div className="text-sm text-slate-500">{n.body}</div>
-            </div>
-          ))}
-        </div>
       </div>
 
       <BoxRequirements box="box5" />
