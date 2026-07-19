@@ -22,6 +22,7 @@ def list_items():
             "folder": item["folder"],
             "folder_order": item.get("folder_order", 0),
             "folder_note": item.get("folder_note"),
+            "folder_group": item.get("folder_group"),
             "items": [],
         })
         grouped[key]["items"].append(item)

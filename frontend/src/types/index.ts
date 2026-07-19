@@ -128,6 +128,7 @@ export interface AnnexureGroup {
   folder: string
   folder_order: number
   folder_note: string | null
+  folder_group: string | null
   items: AnnexureItem[]
 }
 

@@ -230,7 +230,7 @@ MODULE_REPORTS = [
 # Full required-reports list (PBC), organised exactly as the client's "List of Req" file:
 # each row is assigned to a Box and to a named sub-folder within that box.
 # (box, folder, note_or_None, [item_names...])
-ANNEXURE_VERSION = 8
+ANNEXURE_VERSION = 9
 
 ANNEXURE = [
     # ---- Box 1 · Internal Documentation ----
@@ -397,6 +397,33 @@ ANNEXURE = [
     ]),
 ]
 
+# Box 4 folders are presented under three financial-statement groupings
+FOLDER_GROUPS = {
+    # Income Statement items
+    "Revenue": "Income Statement items",
+    "Purchase": "Income Statement items",
+    "Employee Cost": "Income Statement items",
+    "Other Income": "Income Statement items",
+    # Balance Sheet items
+    "Fixed Assets": "Balance Sheet items",
+    "Assets Under Construction": "Balance Sheet items",
+    "Right-of-Use Assets": "Balance Sheet items",
+    "Investments & Property": "Balance Sheet items",
+    "Related Party": "Balance Sheet items",
+    "Accounts Receivables": "Balance Sheet items",
+    "ECL": "Balance Sheet items",
+    "Inventory": "Balance Sheet items",
+    "Prepayment": "Balance Sheet items",
+    "Banks": "Balance Sheet items",
+    "ESOB": "Balance Sheet items",
+    "Borrowings": "Balance Sheet items",
+    "Accounts Payable": "Balance Sheet items",
+    "Accruals": "Balance Sheet items",
+    # Other items
+    "Zakat and Tax": "Other items",
+    "Purchase Invoices": "Other items",
+}
+
 # items deliberately left "missing" so the dashboard's pending actions stay realistic
 MISSING_ITEMS = {
     "Supporting documents for major capital additions during FY2025",
@@ -461,7 +488,7 @@ def _seed_annexure_if_outdated() -> None:
                 status = "reviewed" if len(annexure_items) % 3 == 0 else "uploaded"
             annexure_items.append(dict(
                 id=store.new_id(), linked_box=linked_box, folder=folder, folder_order=folder_order,
-                folder_note=note, item_name=item_name, status=status,
+                folder_note=note, folder_group=FOLDER_GROUPS.get(folder), item_name=item_name, status=status,
             ))
     store.save("annexure_items", annexure_items)
     meta["annexure_version"] = ANNEXURE_VERSION
