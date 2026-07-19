@@ -2,8 +2,11 @@ import json
 import os
 import uuid
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
-UPLOADS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+# DATA_DIR / UPLOADS_DIR are overridable via env so the app can run on a
+# read-only serverless filesystem (e.g. Vercel) by pointing them at /tmp.
+_DEFAULT_ROOT = os.path.dirname(os.path.dirname(__file__))
+DATA_DIR = os.environ.get("DATA_DIR", os.path.join(_DEFAULT_ROOT, "data"))
+UPLOADS_DIR = os.environ.get("UPLOADS_DIR", os.path.join(_DEFAULT_ROOT, "uploads"))
 
 
 def new_id() -> str:
