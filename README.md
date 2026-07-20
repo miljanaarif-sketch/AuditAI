@@ -19,7 +19,7 @@ in two terminals), then open **http://localhost:5174** — the NAWRAS launch pag
 | 1 · Internal Docs | `/box1` | Central repository of non-system documents (legal pack, policies, contracts, governance). Uploading a document with the same name creates a new version; only the latest is current. |
 | 2 · External Confirmations | `/box2` | Circularisation list (customer / supplier / bank / legal-RP), auto-generated request letters, status tracking (sent → received → matched / difference) against GL balances. |
 | 3 · General Ledger | `/box3` | Drillable trial balance: balance → account → journal → source document. Each account carries a document-definition range and a missing-evidence flag. JE-testing panel: manual vs system split and flagged entries (weekend posting, no approval, period-end). |
-| 4 · Operational Reports & Recons | `/box4` | Reports from the operational modules (Production, Payroll & HR, Procurement, Sales, Treasury, Tax) reconciled to GL with a >SAR 10,000 variance threshold. |
+| 4 · Integrated Reports & Recons | `/box4` | Integrated reports from the operational modules (Production, Payroll & HR, Procurement, Sales, Treasury, Tax) reconciled to GL with a >SAR 10,000 variance threshold. |
 | 5 · Financial Reporting | `/box5` | Assembled BS / IS with notes. Click any line to trace it down: FS line → GL account → module report → confirmation. |
 
 ## Required Reports (PBC) (`/annexure`)

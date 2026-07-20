@@ -30,7 +30,7 @@ const FEATURES = [
   },
   {
     icon: GitCompareArrows,
-    title: 'Operational Reports & Recons',
+    title: 'Integrated Reports & Recons',
     text: 'Production, payroll & HR, procurement, treasury and tax reports reconciled to the GL, with variances flagged automatically.',
   },
   {
@@ -117,7 +117,7 @@ export default function LaunchPage() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold tracking-tight mb-3">The Five-Box Model, automated</h2>
           <p className="text-slate-400 max-w-xl mx-auto">
-            Internal · External · Ledger · Operational Reports · Output — one platform,
+            Internal · External · Ledger · Integrated Reports · Output — one platform,
             one evidence chain, no repeated document requests.
           </p>
         </div>

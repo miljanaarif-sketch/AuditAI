@@ -19,7 +19,7 @@ const RECEIVED_STATES = ['received', 'matched', 'difference']
 
 export default function Box2ExternalPage() {
   const [confirmations, setConfirmations] = useState<Confirmation[]>([])
-  const [openFolder, setOpenFolder] = useState<string | null>('customer')
+  const [openFolder, setOpenFolder] = useState<string | null>(null)
   const [letterFor, setLetterFor] = useState<Confirmation | null>(null)
   const [letterText, setLetterText] = useState('')
   const [letterKind, setLetterKind] = useState<'request' | 'received'>('request')

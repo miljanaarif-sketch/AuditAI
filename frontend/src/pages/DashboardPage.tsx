@@ -27,7 +27,7 @@ const BOXES = [
   {
     to: '/box4',
     icon: GitCompareArrows,
-    title: '4 · Operational Reports',
+    title: '4 · Integrated Reports',
     subtitle: 'Production · payroll & HR · procurement · treasury · recon engine',
   },
   {

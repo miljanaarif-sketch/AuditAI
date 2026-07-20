@@ -7,8 +7,8 @@ export default function Box4ModulesPage() {
   return (
     <div>
       <Header
-        title="4 · Operational Reports & Reconciliations"
-        subtitle="Reports from the operational modules — Production, Payroll & HR, Procurement, Sales, Treasury and Tax — reconciled against the General Ledger."
+        title="4 · Integrated Reports & Reconciliations"
+        subtitle="Integrated reports from the operational modules — Production, Payroll & HR, Procurement, Sales, Treasury and Tax — reconciled against the General Ledger."
       />
 
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 flex items-start gap-4">
@@ -26,7 +26,7 @@ export default function Box4ModulesPage() {
 
       <BankReconciliationPanel />
 
-      <BoxRequirements box="box4" title="Required Operational Reports" />
+      <BoxRequirements box="box4" title="Required Integrated Reports" />
     </div>
   )
 }

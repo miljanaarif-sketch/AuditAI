@@ -27,7 +27,7 @@ const BOXES = [
   { key: 'box1', label: 'Box 1 · Internal Documentation', icon: FolderKey },
   { key: 'box2', label: 'Box 2 · External Confirmations', icon: Send },
   { key: 'box3', label: 'Box 3 · General Ledger', icon: BookOpenCheck },
-  { key: 'box4', label: 'Box 4 · Operational Reports & Recons', icon: GitCompareArrows },
+  { key: 'box4', label: 'Box 4 · Integrated Reports & Recons', icon: GitCompareArrows },
   { key: 'box5', label: 'Box 5 · Financial Reporting', icon: FileBarChart },
 ]
 

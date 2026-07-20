@@ -37,11 +37,11 @@ def summary():
         {"section": "Internal Documentation", "weight": 10, "pct": annexure_pct("box1")},
         {"section": "External Confirmations", "weight": 10,
          "pct": round(sum(1 for c in confs if c["status"] == "matched") / len(confs) * 100) if confs else 0},
-        {"section": "General Ledger", "weight": 30,
+        {"section": "General Ledger", "weight": 35,
          "pct": round((len(accounts) - accounts_missing_evidence) / len(accounts) * 100) if accounts else 0},
-        {"section": "Modules & Reconciliations", "weight": 20,
+        {"section": "Integrated Reports & Recons", "weight": 20,
          "pct": round((len(reports) - flagged_reports) / len(reports) * 100) if reports else 0},
-        {"section": "Financial Reporting", "weight": 20,
+        {"section": "Financial Reporting", "weight": 15,
          "pct": round(len({l["statement"] for l in store.load("statement_lines")}) / 4 * 100)},
     ]
     total_weight = sum(p["weight"] for p in progress)

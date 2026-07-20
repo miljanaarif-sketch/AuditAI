@@ -17,7 +17,7 @@ const links = [
   { to: '/box1', label: '1 · Internal Documentation', icon: FolderKey },
   { to: '/box2', label: '2 · External Confirmations', icon: Send },
   { to: '/box3', label: '3 · General Ledger', icon: BookOpenCheck },
-  { to: '/box4', label: '4 · Operational Reports & Recons', icon: GitCompareArrows },
+  { to: '/box4', label: '4 · Integrated Reports & Recons', icon: GitCompareArrows },
   { to: '/box5', label: '5 · Financial Reporting', icon: FileBarChart },
   { to: '/annexure', label: 'Full Item Listing', icon: ClipboardList },
   { to: '/comms', label: 'Auditor Communications', icon: MessagesSquare },
