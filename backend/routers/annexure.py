@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from datetime import datetime
+
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from services import store
@@ -8,6 +10,11 @@ router = APIRouter(prefix="/annexure", tags=["Annexure Checklist"])
 
 class StatusUpdate(BaseModel):
     status: str
+
+
+def _slug(text: str) -> str:
+    keep = [c.lower() if c.isalnum() else "_" for c in text]
+    return "".join(keep).strip("_")[:40]
 
 
 @router.get("/items")
@@ -45,5 +52,46 @@ def update_status(item_id: str, body: StatusUpdate):
     if not item:
         raise HTTPException(404, "Item not found")
     item["status"] = body.status
+    store.save("annexure_items", items)
+    return item
+
+
+@router.post("/items/{item_id}/upload")
+async def upload_item(item_id: str, file: UploadFile = File(...), category: str = Form(None)):
+    """Attach a manually uploaded document to a required item."""
+    items = store.load("annexure_items")
+    item = next((i for i in items if i["id"] == item_id), None)
+    if not item:
+        raise HTTPException(404, "Item not found")
+
+    upload_path = store.upload_dir("annexure")
+    contents = await file.read()
+    with open(f"{upload_path}/{store.new_id()}_{file.filename}", "wb") as f:
+        f.write(contents)
+
+    item["status"] = "uploaded"
+    item["source"] = "upload"
+    item["filename"] = file.filename
+    item["populated_at"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+    store.save("annexure_items", items)
+    return item
+
+
+@router.post("/items/{item_id}/pull-nawras")
+def pull_from_nawras(item_id: str):
+    """Simulate auto-populating a required report directly from the NAWRAS ERP.
+
+    In production this endpoint would call the NAWRAS ERP API and stream the report
+    back. Here it records a synthetic export so the integration flow is demonstrable.
+    """
+    items = store.load("annexure_items")
+    item = next((i for i in items if i["id"] == item_id), None)
+    if not item:
+        raise HTTPException(404, "Item not found")
+
+    item["status"] = "reviewed"
+    item["source"] = "nawras"
+    item["filename"] = f"NAWRAS_{_slug(item['folder'])}_{_slug(item['item_name'])}.xlsx"
+    item["populated_at"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
     store.save("annexure_items", items)
     return item

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { ChevronUp, ChevronRight, Folder, FolderOpen } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ChevronUp, ChevronRight, Folder, FolderOpen, Upload, DatabaseZap, FileCheck2 } from 'lucide-react'
 import client from '../api/client'
 import StatusBadge from './StatusBadge'
-import type { AnnexureGroup } from '../types'
+import type { AnnexureGroup, AnnexureItem } from '../types'
 
 const STATUS_OPTIONS = [
   { value: 'missing', label: 'missing' },
@@ -13,6 +13,87 @@ const STATUS_OPTIONS = [
 
 const GROUP_ORDER = ['Income Statement items', 'Balance Sheet items', 'Other items']
 
+function ItemRow({ item, onChanged }: { item: AnnexureItem; onChanged: () => void }) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function setStatus(status: string) {
+    await client.post(`/annexure/items/${item.id}/status`, { status })
+    onChanged()
+  }
+  async function pullNawras() {
+    setBusy(true)
+    try {
+      await client.post(`/annexure/items/${item.id}/pull-nawras`)
+      onChanged()
+    } finally {
+      setBusy(false)
+    }
+  }
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setBusy(true)
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      await client.post(`/annexure/items/${item.id}/upload`, form)
+      onChanged()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-3 text-sm border-b border-slate-50 pb-1.5">
+      <div className="min-w-0">
+        <div className="text-slate-700">{item.item_name}</div>
+        {item.source && (
+          <div className="flex items-center gap-1 text-xs mt-0.5 text-slate-400">
+            <FileCheck2 size={11} className={item.source === 'nawras' ? 'text-violet-600' : 'text-sky-600'} />
+            <span className={item.source === 'nawras' ? 'text-violet-600 font-medium' : 'text-sky-600 font-medium'}>
+              {item.source === 'nawras' ? 'NAWRAS ERP' : 'Uploaded'}
+            </span>
+            <span className="truncate">· {item.filename}</span>
+            {item.populated_at && <span>· {item.populated_at}</span>}
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-1.5 shrink-0">
+        <button
+          onClick={pullNawras}
+          disabled={busy}
+          title="Auto-populate this report directly from the NAWRAS ERP"
+          className="flex items-center gap-1 rounded-lg border border-violet-200 bg-violet-50 text-violet-700 text-[11px] px-2 py-1 hover:bg-violet-100 disabled:opacity-50"
+        >
+          <DatabaseZap size={12} /> NAWRAS
+        </button>
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={busy}
+          title="Upload a document for this item"
+          className="flex items-center gap-1 rounded-lg border border-slate-200 text-slate-600 text-[11px] px-2 py-1 hover:border-sky-300 hover:text-sky-700 disabled:opacity-50"
+        >
+          <Upload size={12} /> Upload
+        </button>
+        <input ref={fileRef} type="file" className="hidden" onChange={onFile} />
+        <StatusBadge status={item.status} />
+        <select
+          value={item.status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="rounded-lg border border-slate-200 px-1.5 py-0.5 text-xs"
+        >
+          {STATUS_OPTIONS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  )
+}
+
 export default function BoxRequirements({ box, title = 'Requirements & Evidence' }: { box: string; title?: string }) {
   const [groups, setGroups] = useState<AnnexureGroup[]>([])
   const [openFolder, setOpenFolder] = useState<string | null>(null)
@@ -22,11 +103,6 @@ export default function BoxRequirements({ box, title = 'Requirements & Evidence'
   }
 
   useEffect(refresh, [box])
-
-  async function updateStatus(itemId: string, status: string) {
-    await client.post(`/annexure/items/${itemId}/status`, { status })
-    refresh()
-  }
 
   if (groups.length === 0) return null
 
@@ -69,26 +145,7 @@ export default function BoxRequirements({ box, title = 'Requirements & Evidence'
             )}
             <div className="space-y-1.5">
               {g.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between gap-3 text-sm border-b border-slate-50 pb-1.5"
-                >
-                  <span className="text-slate-700">{item.item_name}</span>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <StatusBadge status={item.status} />
-                    <select
-                      value={item.status}
-                      onChange={(e) => updateStatus(item.id, e.target.value)}
-                      className="rounded-lg border border-slate-200 px-1.5 py-0.5 text-xs"
-                    >
-                      {STATUS_OPTIONS.map((s) => (
-                        <option key={s.value} value={s.value}>
-                          {s.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                <ItemRow key={item.id} item={item} onChanged={refresh} />
               ))}
             </div>
           </div>

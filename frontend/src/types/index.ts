@@ -128,7 +128,10 @@ export interface AnnexureItem {
   folder_order: number
   folder_note: string | null
   item_name: string
-  status: 'missing' | 'uploaded' | 'reviewed'
+  status: 'missing' | 'uploaded' | 'reviewed' | 'not_applicable'
+  source?: 'upload' | 'nawras'
+  filename?: string
+  populated_at?: string
 }
 
 export interface AnnexureGroup {
