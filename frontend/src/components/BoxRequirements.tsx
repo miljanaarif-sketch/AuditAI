@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronUp, ChevronRight, Folder, FolderOpen, Upload, DatabaseZap, FileCheck2 } from 'lucide-react'
+import { ChevronUp, ChevronRight, Folder, FolderOpen, Upload, PlugZap, FileCheck2 } from 'lucide-react'
 import client from '../api/client'
 import StatusBadge from './StatusBadge'
 import type { AnnexureGroup, AnnexureItem } from '../types'
@@ -50,8 +50,8 @@ function ItemRow({ item, onChanged }: { item: AnnexureItem; onChanged: () => voi
         <div className="text-slate-700">{item.item_name}</div>
         {item.source && (
           <div className="flex items-center gap-1 text-xs mt-0.5 text-slate-400">
-            <FileCheck2 size={11} className={item.source === 'nawras' ? 'text-violet-600' : 'text-sky-600'} />
-            <span className={item.source === 'nawras' ? 'text-violet-600 font-medium' : 'text-sky-600 font-medium'}>
+            <FileCheck2 size={11} className={item.source === 'nawras' ? 'text-teal-600' : 'text-sky-600'} />
+            <span className={item.source === 'nawras' ? 'text-teal-600 font-medium' : 'text-sky-600 font-medium'}>
               {item.source === 'nawras' ? 'NAWRAS ERP' : 'Uploaded'}
             </span>
             <span className="truncate">· {item.filename}</span>
@@ -63,10 +63,10 @@ function ItemRow({ item, onChanged }: { item: AnnexureItem; onChanged: () => voi
         <button
           onClick={pullNawras}
           disabled={busy}
-          title="Auto-populate this report directly from the NAWRAS ERP"
-          className="flex items-center gap-1 rounded-lg border border-violet-200 bg-violet-50 text-violet-700 text-[11px] px-2 py-1 hover:bg-violet-100 disabled:opacity-50"
+          title="Auto-populate this report directly from the NAWRAS ERP (API connector)"
+          className="flex items-center gap-1 rounded-lg border border-teal-300 bg-teal-50 text-teal-700 text-[11px] px-2 py-1 hover:bg-teal-100 disabled:opacity-50"
         >
-          <DatabaseZap size={12} /> NAWRAS
+          <PlugZap size={12} /> NAWRAS
         </button>
         <button
           onClick={() => fileRef.current?.click()}
