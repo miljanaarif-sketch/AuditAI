@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 backend/data/*.json
+backend/uploads/
 
 # Node / frontend
 node_modules/
