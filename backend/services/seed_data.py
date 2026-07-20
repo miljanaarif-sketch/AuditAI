@@ -104,6 +104,13 @@ CUSTOMERS = [
     ("Al Noor Retail Group", 1200000, "matched"),
     ("Eastern Province Distributors", 980000, "sent"),
     ("Capital Health Systems", 750000, "not_sent"),
+    ("Riyadh Care Hospital", 640000, "not_sent"),
+    ("Jeddah Medical Center", 520000, "not_sent"),
+    ("Dammam Wholesale Co.", 430000, "not_sent"),
+    ("Makkah Trading Est.", 360000, "not_sent"),
+    ("Taibah Distributors", 280000, "not_sent"),
+    ("Najran Supplies Co.", 190000, "not_sent"),
+    ("Hail Retail Group", 120000, "not_sent"),
 ]
 
 SUPPLIERS = [
@@ -112,6 +119,13 @@ SUPPLIERS = [
     ("Al Yamamah Chemicals", 720000, "matched"),
     ("Prime Logistics Co.", 560000, "sent"),
     ("National Spare Parts Est.", 410000, "not_sent"),
+    ("Arabian Polymers Co.", 350000, "not_sent"),
+    ("Red Sea Freight", 300000, "not_sent"),
+    ("Desert Tools Trading", 250000, "not_sent"),
+    ("Modern Machinery Est.", 200000, "not_sent"),
+    ("Falcon Electricals", 150000, "not_sent"),
+    ("Oasis Maintenance Co.", 100000, "not_sent"),
+    ("Sahara Consumables", 60000, "not_sent"),
 ]
 
 BANKS = [

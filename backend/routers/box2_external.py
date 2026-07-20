@@ -17,8 +17,14 @@ class StatusUpdate(BaseModel):
     confirmed_amount: float | None = None
 
 
+class SampleSelect(BaseModel):
+    type: str
+    mode: str            # "all" | "top" | "none"
+    n: int | None = None
+
+
 def _ensure_workflow(conf: dict) -> dict:
-    """Backfill the send-stage workflow and mail log onto older confirmation records."""
+    """Backfill the send-stage workflow, mail log and circularisation selection."""
     if "send_stage" not in conf:
         conf["send_stage"] = "generate" if conf["status"] == "not_sent" else "sent"
     if "mail_log" not in conf:
@@ -30,13 +36,20 @@ def _ensure_workflow(conf: dict) -> dict:
             log.append(dict(at=conf.get("received_date") or "2026-01-15", type="received",
                             text=f"Reply received from {conf['party_name']}"))
         conf["mail_log"] = log
+    if "selected" not in conf:
+        # Banks / related parties / legal default to full circularisation; trade
+        # customers & suppliers start with only the already-circularised parties selected.
+        if conf["type"] in ("customer", "supplier"):
+            conf["selected"] = conf["status"] != "not_sent"
+        else:
+            conf["selected"] = True
     return conf
 
 
 @router.get("/confirmations")
 def list_confirmations(type: str | None = None):
     confs = store.load("confirmations")
-    changed = any("send_stage" not in c or "mail_log" not in c for c in confs)
+    changed = any(k not in c for c in confs for k in ("send_stage", "mail_log", "selected"))
     for c in confs:
         _ensure_workflow(c)
     if changed:
@@ -44,6 +57,44 @@ def list_confirmations(type: str | None = None):
     if type:
         confs = [c for c in confs if c["type"] == type]
     return confs
+
+
+@router.post("/select-sample")
+def select_sample(body: SampleSelect):
+    """Phase 1 — pick the circularisation sample for a confirmation type:
+    all parties, the top-N by balance, or none."""
+    confs = store.load("confirmations")
+    group = [c for c in confs if c["type"] == body.type]
+    for c in confs:
+        _ensure_workflow(c)
+    if body.mode == "all":
+        for c in group:
+            c["selected"] = True
+    elif body.mode == "none":
+        for c in group:
+            c["selected"] = False
+    elif body.mode == "top":
+        n = body.n or 0
+        ranked = sorted(group, key=lambda c: c["gl_balance"], reverse=True)
+        top_ids = {c["id"] for c in ranked[:n]}
+        for c in group:
+            c["selected"] = c["id"] in top_ids
+    else:
+        raise HTTPException(400, "mode must be all | top | none")
+    store.save("confirmations", confs)
+    return [c for c in confs if c["type"] == body.type]
+
+
+@router.post("/confirmations/{confirmation_id}/toggle-select")
+def toggle_select(confirmation_id: str):
+    confs = store.load("confirmations")
+    conf = next((c for c in confs if c["id"] == confirmation_id), None)
+    if not conf:
+        raise HTTPException(404, "Confirmation not found")
+    _ensure_workflow(conf)
+    conf["selected"] = not conf.get("selected", False)
+    store.save("confirmations", confs)
+    return conf
 
 
 @router.get("/summary")

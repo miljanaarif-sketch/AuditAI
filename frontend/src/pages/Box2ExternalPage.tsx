@@ -22,6 +22,9 @@ const STEPS: { key: Confirmation['send_stage']; label: string }[] = [
 ]
 const REPLY_OPTIONS = ['received', 'matched', 'difference']
 const RECEIVED_STATES = ['received', 'matched', 'difference']
+const SAMPLE_OPTIONS = [50, 40, 20, 10]
+// legal confirmations are a single document, not a balance circularisation
+const SAMPLEABLE = ['customer', 'supplier', 'bank', 'related_party']
 
 function Stepper({ conf, onAdvance, onViewLetter }: { conf: Confirmation; onAdvance: () => void; onViewLetter: () => void }) {
   const current = STEPS.findIndex((s) => s.key === conf.send_stage)
@@ -101,6 +104,16 @@ export default function Box2ExternalPage() {
     refresh()
   }
 
+  async function selectSample(type: string, mode: string, n?: number) {
+    await client.post('/box2/select-sample', { type, mode, n })
+    refresh()
+  }
+
+  async function toggleSelect(conf: Confirmation) {
+    await client.post(`/box2/confirmations/${conf.id}/toggle-select`)
+    refresh()
+  }
+
   return (
     <div>
       <Header
@@ -114,6 +127,8 @@ export default function Box2ExternalPage() {
           if (rows.length === 0) return null
           const sent = rows.filter((c) => c.send_stage === 'sent').length
           const received = rows.filter((c) => RECEIVED_STATES.includes(c.status)).length
+          const selectedCount = rows.filter((c) => c.selected).length
+          const sampleable = SAMPLEABLE.includes(key)
           const isOpen = openFolder === key
           return (
             <div key={key} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
@@ -127,7 +142,7 @@ export default function Box2ExternalPage() {
                   </span>
                   <span className="font-semibold">{label}</span>
                   <span className="text-xs text-slate-400">
-                    · {rows.length} parties · {sent} sent · {received} replies
+                    · {rows.length} parties · {selectedCount} selected · {sent} sent · {received} replies
                   </span>
                 </span>
                 {isOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronRight size={16} className="text-slate-400" />}
@@ -135,9 +150,39 @@ export default function Box2ExternalPage() {
 
               {isOpen && (
                 <div className="px-5 pb-5 border-t border-slate-100 pt-3 overflow-x-auto">
+                  {sampleable && (
+                    <div className="flex items-center flex-wrap gap-2 mb-3 text-xs">
+                      <span className="font-medium text-slate-600">Circularisation sample:</span>
+                      <button
+                        onClick={() => selectSample(key, 'all')}
+                        className="rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 px-2.5 py-1 hover:bg-emerald-100"
+                      >
+                        Select all
+                      </button>
+                      {SAMPLE_OPTIONS.map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => selectSample(key, 'top', n)}
+                          className="rounded-lg border border-slate-200 text-slate-600 px-2.5 py-1 hover:border-sky-300 hover:text-sky-700"
+                        >
+                          Top {n}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => selectSample(key, 'none')}
+                        className="rounded-lg border border-slate-200 text-slate-500 px-2.5 py-1 hover:bg-slate-50"
+                      >
+                        Clear
+                      </button>
+                      <span className="text-slate-400">
+                        {selectedCount} of {rows.length} selected (by balance) · then run the workflow on selected
+                      </span>
+                    </div>
+                  )}
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-left text-slate-500 border-b border-slate-200">
+                        <th className="py-2 pr-3 font-medium w-8"></th>
                         <th className="py-2 pr-4 font-medium">Party</th>
                         <th className="py-2 pr-4 font-medium text-right">GL Balance</th>
                         <th className="py-2 pr-4 font-medium text-right">Confirmed</th>
@@ -150,8 +195,18 @@ export default function Box2ExternalPage() {
                       {rows.map((c) => {
                         const hasReply = RECEIVED_STATES.includes(c.status)
                         const isSent = c.send_stage === 'sent'
+                        const dim = sampleable && !c.selected
                         return (
-                          <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50">
+                          <tr key={c.id} className={`border-b border-slate-100 hover:bg-slate-50 ${dim ? 'opacity-45' : ''}`}>
+                            <td className="py-2 pr-3">
+                              <input
+                                type="checkbox"
+                                checked={c.selected}
+                                onChange={() => toggleSelect(c)}
+                                className="accent-emerald-600"
+                                title="Include in circularisation sample"
+                              />
+                            </td>
                             <td className="py-2 pr-4 text-slate-800">{c.party_name}</td>
                             <td className="py-2 pr-4 text-right text-slate-700">{formatSAR(c.gl_balance)}</td>
                             <td className={`py-2 pr-4 text-right ${c.difference ? 'text-rose-600' : 'text-slate-700'}`}>
@@ -159,7 +214,11 @@ export default function Box2ExternalPage() {
                               {c.difference ? <span className="block text-[11px]">Δ {formatSAR(c.difference)}</span> : null}
                             </td>
                             <td className="py-2 pr-4">
-                              <Stepper conf={c} onAdvance={() => advance(c)} onViewLetter={() => viewRequestLetter(c)} />
+                              {dim ? (
+                                <span className="text-xs text-slate-400">not in sample</span>
+                              ) : (
+                                <Stepper conf={c} onAdvance={() => advance(c)} onViewLetter={() => viewRequestLetter(c)} />
+                              )}
                             </td>
                             <td className="py-2 pr-4">
                               {!isSent ? (

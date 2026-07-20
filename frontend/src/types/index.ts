@@ -43,6 +43,7 @@ export interface Confirmation {
   received_date: string | null
   send_stage: 'generate' | 'approved' | 'sent'
   mail_log: MailLogEntry[]
+  selected: boolean
 }
 
 export interface GLAccount {
