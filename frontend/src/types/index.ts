@@ -44,6 +44,7 @@ export interface Confirmation {
   send_stage: 'generate' | 'approved' | 'sent'
   mail_log: MailLogEntry[]
   selected: boolean
+  document_filename?: string
 }
 
 export interface GLAccount {

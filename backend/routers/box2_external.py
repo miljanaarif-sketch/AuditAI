@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from services import store
@@ -153,6 +153,33 @@ def received_letter(confirmation_id: str):
         "confirmed_amount": confirmed,
         "difference": diff,
     }
+
+
+@router.post("/confirmations/{confirmation_id}/upload")
+async def upload_confirmation_document(confirmation_id: str, file: UploadFile = File(...)):
+    """Attach a document to a confirmation (used for legal confirmations, which are a
+    single uploaded lawyer's letter rather than a balance circularisation)."""
+    confs = store.load("confirmations")
+    conf = next((c for c in confs if c["id"] == confirmation_id), None)
+    if not conf:
+        raise HTTPException(404, "Confirmation not found")
+    _ensure_workflow(conf)
+
+    upload_path = store.upload_dir("box2")
+    contents = await file.read()
+    with open(f"{upload_path}/{store.new_id()}_{file.filename}", "wb") as f:
+        f.write(contents)
+
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+    conf["document_filename"] = file.filename
+    conf["status"] = "matched"
+    conf["send_stage"] = "sent"
+    conf["received_date"] = datetime.utcnow().strftime("%Y-%m-%d")
+    conf.setdefault("mail_log", []).append(
+        dict(at=now, type="received", text=f"Legal confirmation document uploaded — {conf['party_name']}")
+    )
+    store.save("confirmations", confs)
+    return conf
 
 
 @router.post("/confirmations/{confirmation_id}/advance")

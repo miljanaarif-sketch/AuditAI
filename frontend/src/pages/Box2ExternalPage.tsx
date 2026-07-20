@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Mail, MailCheck, ChevronUp, ChevronRight, Users, Truck, Landmark, Scale, Handshake, Check } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Mail, MailCheck, ChevronUp, ChevronRight, Users, Truck, Landmark, Scale, Handshake, Check, Upload, FileCheck2 } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
 import BoxRequirements from '../components/BoxRequirements'
@@ -62,6 +62,52 @@ function Stepper({ conf, onAdvance, onViewLetter }: { conf: Confirmation; onAdva
           <Check size={11} /> Sent
         </span>
       )}
+    </div>
+  )
+}
+
+function LegalDocRow({ conf, onChanged }: { conf: Confirmation; onChanged: () => void }) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+  const uploaded = !!conf.document_filename
+
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setBusy(true)
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      await client.post(`/box2/confirmations/${conf.id}/upload`, form)
+      onChanged()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-slate-50 py-2 text-sm">
+      <div className="min-w-0">
+        <div className="text-slate-800">{conf.party_name}</div>
+        {uploaded && (
+          <div className="flex items-center gap-1 text-xs text-emerald-600 mt-0.5">
+            <FileCheck2 size={11} />
+            <span className="font-medium">Uploaded</span>
+            <span className="text-slate-400 truncate">· {conf.document_filename} · {conf.received_date}</span>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        <StatusBadge status={uploaded ? 'matched' : 'not_sent'} />
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={busy}
+          className="flex items-center gap-1 rounded-lg border border-slate-200 text-slate-600 text-xs px-2.5 py-1 hover:border-sky-300 hover:text-sky-700 disabled:opacity-50"
+        >
+          <Upload size={12} /> {uploaded ? 'Replace document' : 'Upload document'}
+        </button>
+        <input ref={fileRef} type="file" className="hidden" onChange={onFile} />
+      </div>
     </div>
   )
 }
@@ -150,6 +196,17 @@ export default function Box2ExternalPage() {
 
               {isOpen && (
                 <div className="px-5 pb-5 border-t border-slate-100 pt-3 overflow-x-auto">
+                  {key === 'legal' ? (
+                    <div className="space-y-1">
+                      <div className="text-xs text-slate-400 mb-2">
+                        Legal / litigation confirmation — upload the lawyer's response letter.
+                      </div>
+                      {rows.map((c) => (
+                        <LegalDocRow key={c.id} conf={c} onChanged={refresh} />
+                      ))}
+                    </div>
+                  ) : (
+                    <>
                   {sampleable && (
                     <div className="flex items-center flex-wrap gap-2 mb-3 text-xs">
                       <span className="font-medium text-slate-600">Circularisation sample:</span>
@@ -262,6 +319,8 @@ export default function Box2ExternalPage() {
                       })}
                     </tbody>
                   </table>
+                    </>
+                  )}
                 </div>
               )}
             </div>
