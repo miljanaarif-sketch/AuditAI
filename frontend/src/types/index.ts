@@ -24,6 +24,12 @@ export interface BankReconciliation {
   difference: number
 }
 
+export interface MailLogEntry {
+  at: string
+  type: 'sent' | 'received'
+  text: string
+}
+
 export interface Confirmation {
   id: string
   type: 'customer' | 'supplier' | 'bank' | 'legal_rp'
@@ -35,6 +41,8 @@ export interface Confirmation {
   letter_text: string | null
   sent_date: string | null
   received_date: string | null
+  send_stage: 'generate' | 'approved' | 'sent'
+  mail_log: MailLogEntry[]
 }
 
 export interface GLAccount {

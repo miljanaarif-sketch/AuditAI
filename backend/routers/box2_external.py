@@ -8,15 +8,39 @@ from services.seed_data import ENTITY_NAME
 
 router = APIRouter(prefix="/box2", tags=["Box 2 - External Confirmations"])
 
+# Outbound circularisation workflow: Generate the request letter -> Approve -> Send
+SEND_STAGES = ["generate", "approved", "sent"]
+
 
 class StatusUpdate(BaseModel):
     status: str
     confirmed_amount: float | None = None
 
 
+def _ensure_workflow(conf: dict) -> dict:
+    """Backfill the send-stage workflow and mail log onto older confirmation records."""
+    if "send_stage" not in conf:
+        conf["send_stage"] = "generate" if conf["status"] == "not_sent" else "sent"
+    if "mail_log" not in conf:
+        log = []
+        if conf["send_stage"] == "sent":
+            log.append(dict(at=conf.get("sent_date") or "2026-01-05", type="sent",
+                            text=f"Confirmation request sent to {conf['party_name']}"))
+        if conf["status"] in ("received", "matched", "difference"):
+            log.append(dict(at=conf.get("received_date") or "2026-01-15", type="received",
+                            text=f"Reply received from {conf['party_name']}"))
+        conf["mail_log"] = log
+    return conf
+
+
 @router.get("/confirmations")
 def list_confirmations(type: str | None = None):
     confs = store.load("confirmations")
+    changed = any("send_stage" not in c or "mail_log" not in c for c in confs)
+    for c in confs:
+        _ensure_workflow(c)
+    if changed:
+        store.save("confirmations", confs)
     if type:
         confs = [c for c in confs if c["type"] == type]
     return confs
@@ -80,6 +104,47 @@ def received_letter(confirmation_id: str):
     }
 
 
+@router.post("/confirmations/{confirmation_id}/advance")
+def advance_stage(confirmation_id: str):
+    """Move a confirmation to the next step: generate -> approved -> sent.
+    Reaching 'sent' logs an email both on the confirmation and in the central Sent Log."""
+    confs = store.load("confirmations")
+    conf = next((c for c in confs if c["id"] == confirmation_id), None)
+    if not conf:
+        raise HTTPException(404, "Confirmation not found")
+    _ensure_workflow(conf)
+    current = conf["send_stage"]
+    idx = SEND_STAGES.index(current)
+    if idx >= len(SEND_STAGES) - 1:
+        raise HTTPException(400, "Confirmation has already been sent")
+
+    conf["send_stage"] = SEND_STAGES[idx + 1]
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+
+    if conf["send_stage"] == "sent":
+        if conf["status"] == "not_sent":
+            conf["status"] = "sent"
+        conf["sent_date"] = today
+        conf.setdefault("mail_log", []).append(
+            dict(at=now, type="sent", text=f"Confirmation request sent to {conf['party_name']}")
+        )
+        # mirror into the central Auditor Communications Sent Log
+        emails = store.load("comms_emails")
+        emails.insert(0, dict(
+            id=store.new_id(),
+            to=conf["party_name"],
+            subject=f"Audit confirmation request — {conf['party_name']}",
+            body=conf.get("letter_text", ""),
+            sent_at=now,
+            status="logged (prototype — not dispatched)",
+        ))
+        store.save("comms_emails", emails)
+
+    store.save("confirmations", confs)
+    return conf
+
+
 @router.post("/confirmations/{confirmation_id}/status")
 def update_status(confirmation_id: str, update: StatusUpdate):
     confs = store.load("confirmations")
@@ -87,6 +152,8 @@ def update_status(confirmation_id: str, update: StatusUpdate):
     if not conf:
         raise HTTPException(404, "Confirmation not found")
 
+    _ensure_workflow(conf)
+    prev_status = conf["status"]
     conf["status"] = update.status
     if update.confirmed_amount is not None:
         conf["confirmed_amount"] = update.confirmed_amount
@@ -95,6 +162,11 @@ def update_status(confirmation_id: str, update: StatusUpdate):
         conf["sent_date"] = datetime.utcnow().strftime("%Y-%m-%d")
     if update.status in ("received", "matched", "difference"):
         conf["received_date"] = datetime.utcnow().strftime("%Y-%m-%d")
+        if prev_status not in ("received", "matched", "difference"):
+            conf.setdefault("mail_log", []).append(dict(
+                at=datetime.utcnow().strftime("%Y-%m-%d %H:%M"), type="received",
+                text=f"Reply received from {conf['party_name']}",
+            ))
 
     store.save("confirmations", confs)
     return conf
