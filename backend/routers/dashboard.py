@@ -62,7 +62,7 @@ def summary():
     for a in annexure:
         if a["status"] == "missing":
             pending_actions.append({"priority": "medium", "item": f"Obtain: {a['item_name']}",
-                                    "owner": a["category_name"], "due": "This Week"})
+                                    "owner": a.get("folder", "Audit Team"), "due": "This Week"})
     pending_actions.sort(key=lambda p: 0 if p["priority"] == "high" else 1)
 
     return {
