@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react'
+import { Construction, PlugZap } from 'lucide-react'
 import Header from '../components/Header'
 import BoxRequirements from '../components/BoxRequirements'
 
@@ -15,10 +15,16 @@ export default function Box3LedgerPage() {
           <Construction size={22} />
         </span>
         <div>
-          <div className="text-sm font-semibold text-slate-800 mb-1">GL drill-down engine — to be developed</div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm font-semibold text-slate-800">GL drill-down engine — to be developed</span>
+            <span className="flex items-center gap-1 rounded-full border border-teal-300 bg-teal-50 text-teal-700 text-[11px] px-2 py-0.5">
+              <PlugZap size={11} /> via NAWRAS API
+            </span>
+          </div>
           <p className="text-sm text-slate-500">
-            The live GL (trial balance → journal → source document, JE testing) will connect to the NAWRAS ERP.
-            The required GL reports are tracked in the folders below.
+            GL Dump and journal-entry history load first, then the live trial balance → journal → source document
+            drill-down (JE testing) — all fed directly from the NAWRAS ERP. Revenue and Income-Statement drill-downs
+            are footnotes off the GL. The required GL reports are tracked in the folders below.
           </p>
         </div>
       </div>

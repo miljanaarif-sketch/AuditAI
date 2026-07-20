@@ -235,12 +235,12 @@ MODULE_REPORTS = [
 # Full required-reports list (PBC), organised exactly as the client's "List of Req" file:
 # each row is assigned to a Box and to a named sub-folder within that box.
 # (box, folder, note_or_None, [item_names...])
-ANNEXURE_VERSION = 10
+ANNEXURE_VERSION = 11
 
 ANNEXURE = [
     # ---- Box 1 · Internal Documentation ----
     ("box1", "General & Planning", None, [
-        "Management assessment of going concern along with supporting working of the management",
+        "Management assessment of going concern",
         "Impairment working for PPE",
         "Details of all contingencies and commitments at year end (letters of guarantee / letters of credit / capital commitments)",
         "Details of significant subsequent events post year end",
@@ -248,7 +248,7 @@ ANNEXURE = [
         "Responses to the fraud inquiries",
         "Board / management approvals for capital projects",
     ]),
-    ("box1", "Contracts & Documents", None, [
+    ("box1", "Financial assumptions", None, [
         "Basis of discount rate used in the calculation of IFRS 16",
     ]),
     ("box1", "Related Party", None, [
@@ -277,7 +277,15 @@ ANNEXURE = [
         "Supporting invoices for the expenses incurred during the year (sampled per category)",
     ]),
 
-    # ---- Box 4 · Operational Reports & Recon ----
+    # ---- Box 4 · Integrated Reports & Recon ----
+    ("box4", "Bank Statements", None, [
+        "Bank statements for all banks (full year and subsequent to year end)",
+    ]),
+    ("box4", "Bank Balances & Reconciliation", None, [
+        "Listing of all bank balances as at year end",
+        "Bank reconciliation for December for all accounts",
+        "Direct confirmation from the bank",
+    ]),
     ("box4", "Zakat and Tax", None, [
         "Zakat and income tax working and payment details for the year, and amounts payable as at year end",
         "Zakat and income tax returns for all the quarters filed during the year",
@@ -321,23 +329,29 @@ ANNEXURE = [
     ("box4", "ECL", None, [
         "ECL calculation on receivables balances as at year end, with the ECL model and basis / assumptions used",
     ]),
-    ("box4", "Inventory", None, [
+    ("box4", "Inventory — Raw Materials", None, [
         "Final raw materials inventory listing as of 31 December 2025 (item codes, quantities, rates, values, location)",
         "Raw materials movement report (opening, purchases, issues, closing)",
         "Raw materials valuation working file with supporting data for selected items",
         "Raw materials aging report with obsolete / slow-moving / damaged items and related provision",
+    ]),
+    ("box4", "Inventory — Work in Progress", None, [
         "Final WIP listing as of 31 December 2025 (job/order reference, stage of completion, quantities, values)",
         "WIP movement report (opening, additions, transfers to finished goods, closing)",
         "WIP valuation working file (material, labour, overhead components and allocation basis)",
         "Production reports and supporting schedules evidencing stage of completion at year end",
         "WIP aging analysis with obsolete / non-recoverable WIP and related provision",
         "Cut-off testing — WIP: production reports around year end, jobs transferred to FG, costs included up to 31 December only",
+    ]),
+    ("box4", "Inventory — Finished Goods", None, [
         "Final finished goods inventory listing as of 31 December 2025 (item codes, quantities, rates, values, location)",
         "Finished goods movement report (opening, production transfers, sales/dispatches, closing)",
         "Finished goods valuation working file (cost build-up, overhead allocation, Weighted Average)",
         "Dispatch notes / delivery challans for finished goods issued near year end",
         "Finished goods aging report with slow-moving / obsolete items and related provision",
         "NRV testing: subsequent sales report to verify FG recorded at lower of cost or NRV",
+    ]),
+    ("box4", "Inventory — Spare Parts", None, [
         "Final spare parts inventory listing as of 31 December 2025 (item codes, quantities, rates, values, location)",
         "Spare parts movement report (opening, purchases, issues, closing)",
         "Spare parts valuation working file (Weighted Average basis)",
@@ -351,15 +365,13 @@ ANNEXURE = [
         "Employee-wise detail of advances to employees (sample will be shared for approval)",
         "Agreements of prepayments and invoices, with support of amounts paid",
     ]),
-    ("box4", "Banks", None, [
-        "Bank statements for all banks as at year end (full year and subsequent to year end)",
-        "Bank reconciliation for December 2025 for all accounts",
-        "Direct confirmation from the bank as at 31 December 2025",
-    ]),
     ("box4", "ESOB", None, [
-        "Actuarial valuation report for the year ended 31 December 2025",
         "End of service benefits calculations per Saudi labour law (with movement from opening to closing)",
         "Payments made to leaving employees during the period, with employee list and final settlement files",
+    ]),
+    ("box4", "Actuarial Valuation", None, [
+        "Actuarial valuation report",
+        "Engagement letter",
     ]),
     ("box4", "Borrowings", None, [
         "Signed loan agreements",
@@ -410,6 +422,8 @@ FOLDER_GROUPS = {
     "Employee Cost": "Income Statement items",
     "Other Income": "Income Statement items",
     # Balance Sheet items
+    "Bank Statements": "Balance Sheet items",
+    "Bank Balances & Reconciliation": "Balance Sheet items",
     "Fixed Assets": "Balance Sheet items",
     "Assets Under Construction": "Balance Sheet items",
     "Right-of-Use Assets": "Balance Sheet items",
@@ -417,16 +431,29 @@ FOLDER_GROUPS = {
     "Related Party": "Balance Sheet items",
     "Accounts Receivables": "Balance Sheet items",
     "ECL": "Balance Sheet items",
-    "Inventory": "Balance Sheet items",
+    "Inventory — Raw Materials": "Balance Sheet items",
+    "Inventory — Work in Progress": "Balance Sheet items",
+    "Inventory — Finished Goods": "Balance Sheet items",
+    "Inventory — Spare Parts": "Balance Sheet items",
     "Prepayment": "Balance Sheet items",
-    "Banks": "Balance Sheet items",
     "ESOB": "Balance Sheet items",
+    "Actuarial Valuation": "Balance Sheet items",
     "Borrowings": "Balance Sheet items",
     "Accounts Payable": "Balance Sheet items",
     "Accruals": "Balance Sheet items",
     # Other items
     "Zakat and Tax": "Other items",
     "Purchase Invoices": "Other items",
+}
+
+# Folders where the NAWRAS ERP API cannot auto-populate — these are manual documents
+# (management judgement, legal, actuarial, signed agreements) and only support upload.
+NO_NAWRAS_FOLDERS = {
+    "General & Planning",
+    "Financial assumptions",
+    "Related Party",
+    "Actuarial Valuation",
+    "Bank Statements",
 }
 
 # items deliberately left "missing" so the dashboard's pending actions stay realistic
@@ -495,6 +522,7 @@ def _seed_annexure_if_outdated() -> None:
                 id=store.new_id(), linked_box=linked_box, folder=folder, folder_order=folder_order,
                 folder_note=note,
                 folder_group=(FOLDER_GROUPS.get(folder) if linked_box == "box4" else None),
+                nawras_applicable=folder not in NO_NAWRAS_FOLDERS,
                 item_name=item_name, status=status,
             ))
     store.save("annexure_items", annexure_items)

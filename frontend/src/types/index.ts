@@ -129,6 +129,7 @@ export interface AnnexureItem {
   folder_note: string | null
   item_name: string
   status: 'missing' | 'uploaded' | 'reviewed' | 'not_applicable'
+  nawras_applicable?: boolean
   source?: 'upload' | 'nawras'
   filename?: string
   populated_at?: string

@@ -7,7 +7,6 @@ import {
   BookOpenCheck,
   GitCompareArrows,
   FileBarChart,
-  ClipboardList,
   MessagesSquare,
 } from 'lucide-react'
 
@@ -19,7 +18,6 @@ const links = [
   { to: '/box3', label: '3 · General Ledger', icon: BookOpenCheck },
   { to: '/box4', label: '4 · Integrated Reports & Recons', icon: GitCompareArrows },
   { to: '/box5', label: '5 · Financial Reporting', icon: FileBarChart },
-  { to: '/annexure', label: 'Full Item Listing', icon: ClipboardList },
   { to: '/comms', label: 'Auditor Communications', icon: MessagesSquare },
 ]
 
@@ -29,7 +27,6 @@ export default function Sidebar() {
       <Link to="/" className="block px-5 py-5 border-b border-slate-800 hover:bg-slate-800/50 transition">
         <div className="text-lg font-bold text-white tracking-tight">NAWRAS</div>
         <div className="text-xs font-medium text-emerald-400 mt-0.5 tracking-wide">Plan • Validate • Report</div>
-        <div className="text-xs text-slate-400 mt-1">Obeikan Plastic · FY2025</div>
       </Link>
       <nav className="flex-1 px-3 py-4 space-y-1">
         {links.map(({ to, label, icon: Icon }) => (

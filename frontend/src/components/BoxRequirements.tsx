@@ -60,14 +60,16 @@ function ItemRow({ item, onChanged }: { item: AnnexureItem; onChanged: () => voi
         )}
       </div>
       <div className="flex items-center gap-1.5 shrink-0">
-        <button
-          onClick={pullNawras}
-          disabled={busy}
-          title="Auto-populate this report directly from the NAWRAS ERP (API connector)"
-          className="flex items-center gap-1 rounded-lg border border-teal-300 bg-teal-50 text-teal-700 text-[11px] px-2 py-1 hover:bg-teal-100 disabled:opacity-50"
-        >
-          <PlugZap size={12} /> NAWRAS
-        </button>
+        {item.nawras_applicable !== false && (
+          <button
+            onClick={pullNawras}
+            disabled={busy}
+            title="Auto-populate this report directly from the NAWRAS ERP (API connector)"
+            className="flex items-center gap-1 rounded-lg border border-teal-300 bg-teal-50 text-teal-700 text-[11px] px-2 py-1 hover:bg-teal-100 disabled:opacity-50"
+          >
+            <PlugZap size={12} /> NAWRAS
+          </button>
+        )}
         <button
           onClick={() => fileRef.current?.click()}
           disabled={busy}

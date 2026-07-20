@@ -92,10 +92,10 @@ export default function LaunchPage() {
             Enter Platform <ArrowRight size={17} />
           </Link>
           <Link
-            to="/annexure"
+            to="/box1"
             className="flex items-center gap-2 rounded-xl border border-slate-700 text-slate-200 font-medium px-6 py-3 hover:border-slate-500 transition"
           >
-            Required Reports (PBC)
+            Explore the Five Boxes
           </Link>
         </div>
       </section>

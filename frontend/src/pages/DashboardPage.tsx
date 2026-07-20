@@ -69,10 +69,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <Header
-        title="Dashboard"
-        subtitle="Obeikan Plastic · FY2025 — the Five-Box Model at a glance."
-      />
+      <Header title="Dashboard" subtitle="FY2025" />
 
       <div className="grid grid-cols-5 gap-4 mb-8">
         {BOXES.map(({ to, icon: Icon, title, subtitle }) => (

@@ -8,7 +8,6 @@ import Box2ExternalPage from './pages/Box2ExternalPage'
 import Box3LedgerPage from './pages/Box3LedgerPage'
 import Box4ModulesPage from './pages/Box4ModulesPage'
 import Box5ReportingPage from './pages/Box5ReportingPage'
-import AnnexureChecklistPage from './pages/AnnexureChecklistPage'
 import CommunicationsPage from './pages/CommunicationsPage'
 
 function AppLayout() {
@@ -34,7 +33,6 @@ function App() {
         <Route path="/box3" element={<Box3LedgerPage />} />
         <Route path="/box4" element={<Box4ModulesPage />} />
         <Route path="/box5" element={<Box5ReportingPage />} />
-        <Route path="/annexure" element={<AnnexureChecklistPage />} />
         <Route path="/comms" element={<CommunicationsPage />} />
       </Route>
     </Routes>
