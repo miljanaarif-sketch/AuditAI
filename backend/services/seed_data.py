@@ -119,9 +119,14 @@ BANKS = [
     ("Arab National Bank (ANB)", 1000000, "received"),
 ]
 
-LEGAL_RP = [
-    ("Al Rashid Law Firm (litigation)", 0, "received"),
+RELATED_PARTY = [
     ("Obeikan Investment Group (ultimate parent)", 3200000, "matched"),
+    ("Obeikan Glass Co. (fellow subsidiary)", 1450000, "sent"),
+    ("Obeikan Paper Industries (fellow subsidiary)", 780000, "not_sent"),
+]
+
+LEGAL = [
+    ("Al Rashid Law Firm (litigation)", 0, "received"),
 ]
 
 # (document name, folder, status, level) — folder groups big lists inside a category;
@@ -230,7 +235,7 @@ MODULE_REPORTS = [
 # Full required-reports list (PBC), organised exactly as the client's "List of Req" file:
 # each row is assigned to a Box and to a named sub-folder within that box.
 # (box, folder, note_or_None, [item_names...])
-ANNEXURE_VERSION = 9
+ANNEXURE_VERSION = 10
 
 ANNEXURE = [
     # ---- Box 1 · Internal Documentation ----
@@ -488,7 +493,9 @@ def _seed_annexure_if_outdated() -> None:
                 status = "reviewed" if len(annexure_items) % 3 == 0 else "uploaded"
             annexure_items.append(dict(
                 id=store.new_id(), linked_box=linked_box, folder=folder, folder_order=folder_order,
-                folder_note=note, folder_group=FOLDER_GROUPS.get(folder), item_name=item_name, status=status,
+                folder_note=note,
+                folder_group=(FOLDER_GROUPS.get(folder) if linked_box == "box4" else None),
+                item_name=item_name, status=status,
             ))
     store.save("annexure_items", annexure_items)
     meta["annexure_version"] = ANNEXURE_VERSION
@@ -534,7 +541,8 @@ def seed_if_empty() -> None:
         _confirmation_records("customer", CUSTOMERS)
         + _confirmation_records("supplier", SUPPLIERS)
         + _confirmation_records("bank", BANKS)
-        + _confirmation_records("legal_rp", LEGAL_RP)
+        + _confirmation_records("related_party", RELATED_PARTY)
+        + _confirmation_records("legal", LEGAL)
     )
     store.save("confirmations", confirmations)
 

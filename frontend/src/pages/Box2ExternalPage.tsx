@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Mail, MailCheck, ChevronUp, ChevronRight, Users, Truck, Landmark, Scale, Check } from 'lucide-react'
+import { Mail, MailCheck, ChevronUp, ChevronRight, Users, Truck, Landmark, Scale, Handshake, Check } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
 import BoxRequirements from '../components/BoxRequirements'
@@ -11,7 +11,8 @@ const TYPES = [
   { key: 'customer', label: 'Customer Confirmations', icon: Users },
   { key: 'supplier', label: 'Supplier Confirmations', icon: Truck },
   { key: 'bank', label: 'Bank Confirmations', icon: Landmark },
-  { key: 'legal_rp', label: 'Legal & Related Party Confirmations', icon: Scale },
+  { key: 'related_party', label: 'Related Party Confirmations', icon: Handshake },
+  { key: 'legal', label: 'Legal Confirmations', icon: Scale },
 ]
 
 const STEPS: { key: Confirmation['send_stage']; label: string }[] = [

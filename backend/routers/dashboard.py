@@ -50,7 +50,10 @@ def summary():
     pending_actions = []
     for c in confs:
         if c["status"] == "not_sent":
-            owner = "Treasury" if c["type"] == "bank" else "Legal" if c["type"] == "legal_rp" else "Finance"
+            owner = ("Treasury" if c["type"] == "bank"
+                     else "Legal" if c["type"] == "legal"
+                     else "Finance" if c["type"] == "related_party"
+                     else "Finance")
             pending_actions.append({"priority": "high", "item": f"Send confirmation — {c['party_name']}",
                                     "owner": owner, "due": "Today"})
     for r in reports:

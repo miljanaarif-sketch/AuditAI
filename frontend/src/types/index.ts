@@ -32,7 +32,7 @@ export interface MailLogEntry {
 
 export interface Confirmation {
   id: string
-  type: 'customer' | 'supplier' | 'bank' | 'legal_rp'
+  type: 'customer' | 'supplier' | 'bank' | 'related_party' | 'legal'
   party_name: string
   gl_balance: number
   status: 'not_sent' | 'sent' | 'received' | 'matched' | 'difference'
