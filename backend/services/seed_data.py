@@ -208,6 +208,44 @@ KEY_MANAGEMENT = [
          role="Information technology", compensation=650000),
 ]
 
+# Auditor-communication tickets — the query/request queue with a message thread
+TICKETS = [
+    dict(number=1243, subject="Confirmation reply pending — Capital Health Systems", status="pending",
+         severity="high", type="Confirmation", group="AR Team", assigned_to="Sara Al-Harbi", days_open=2,
+         messages=[
+             dict(sender="System", at="2026-01-05 09:10", text="Confirmation request sent to Capital Health Systems (SAR 750,000)."),
+             dict(sender="Audit Team", at="2026-01-06 14:22", text="No reply received yet. Please follow up with the client's AR contact."),
+         ]),
+    dict(number=1244, subject="Bank reconciliation variance — Riyadh Bank", status="open",
+         severity="high", type="Reconciliation", group="Treasury", assigned_to="Omar Siddiqui", days_open=1,
+         messages=[
+             dict(sender="Audit Team", at="2026-01-07 10:05", text="Adjusted book balance ties to the bank statement — please confirm the outstanding cheques list."),
+         ]),
+    dict(number=1245, subject="Missing: supporting documents for major capital additions (PPE)", status="pending",
+         severity="normal", type="Document Request", group="Fixed Assets", assigned_to="Nadia Hassan", days_open=5,
+         messages=[
+             dict(sender="Audit Team", at="2026-01-03 11:40", text="Capex additions >SAR 1m need PO, invoice and board approval."),
+             dict(sender="Client", at="2026-01-04 16:10", text="Gathering the approvals — expect to share by end of week."),
+         ]),
+    dict(number=1246, subject="NAWRAS API export — payroll summary (Jan–Dec)", status="open",
+         severity="normal", type="Integration", group="Payroll", assigned_to="Maha Al-Otaibi", days_open=1,
+         messages=[
+             dict(sender="System", at="2026-01-07 08:30", text="Payroll summary pulled from NAWRAS ERP. Names excluded per policy."),
+         ]),
+    dict(number=1247, subject="Legal confirmation letter — litigation status", status="pending",
+         severity="high", type="Confirmation", group="Legal", assigned_to="Reem Al-Saleh", days_open=3,
+         messages=[
+             dict(sender="Audit Team", at="2026-01-05 13:15", text="Request sent to Al Rashid Law Firm for litigation status confirmation."),
+         ]),
+    dict(number=1248, subject="Clarify EOSB actuarial assumptions", status="closed",
+         severity="normal", type="Query", group="HR", assigned_to="Tariq Mahmoud", days_open=7,
+         messages=[
+             dict(sender="Audit Team", at="2026-01-01 09:00", text="Please confirm discount rate and salary-escalation used in the EOSB actuarial valuation."),
+             dict(sender="Client", at="2026-01-02 10:30", text="Discount 4.5%, escalation 3.0% — actuary report attached."),
+             dict(sender="Audit Team", at="2026-01-02 15:45", text="Received and agreed. Closing this query."),
+         ]),
+]
+
 # responsible person per Box 1 category — surfaced in the drill-down
 DOC_OWNERS = {
     "Legal pack": ("Reem Al-Saleh", "r.alsaleh@obeikanplastic.example.sa"),
@@ -549,6 +587,8 @@ def seed_if_empty() -> None:
     _seed_documents_if_outdated()
     if not store.exists("key_management"):
         store.save("key_management", [dict(id=store.new_id(), **k) for k in KEY_MANAGEMENT])
+    if not store.exists("tickets"):
+        store.save("tickets", [dict(id=store.new_id(), **t) for t in TICKETS])
     if store.exists("gl_accounts"):
         return
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from services import store
@@ -16,6 +16,14 @@ class EmailRequest(BaseModel):
     to: str
     subject: str
     body: str
+
+
+class TicketReply(BaseModel):
+    text: str
+
+
+class TicketStatus(BaseModel):
+    status: str
 
 
 def _now() -> str:
@@ -90,6 +98,37 @@ def chat(body: ChatRequest):
     messages.append(assistant)
     store.save("comms_messages", messages)
     return assistant
+
+
+@router.get("/tickets")
+def list_tickets():
+    return sorted(store.load("tickets"), key=lambda t: t["number"], reverse=True)
+
+
+@router.post("/tickets/{ticket_id}/reply")
+def reply_ticket(ticket_id: str, body: TicketReply):
+    tickets = store.load("tickets")
+    ticket = next((t for t in tickets if t["id"] == ticket_id), None)
+    if not ticket:
+        raise HTTPException(404, "Ticket not found")
+    ticket.setdefault("messages", []).append(
+        dict(sender="Audit Team", at=_now(), text=body.text)
+    )
+    store.save("tickets", tickets)
+    return ticket
+
+
+@router.post("/tickets/{ticket_id}/status")
+def set_ticket_status(ticket_id: str, body: TicketStatus):
+    if body.status not in ("open", "pending", "closed"):
+        raise HTTPException(400, "status must be open | pending | closed")
+    tickets = store.load("tickets")
+    ticket = next((t for t in tickets if t["id"] == ticket_id), None)
+    if not ticket:
+        raise HTTPException(404, "Ticket not found")
+    ticket["status"] = body.status
+    store.save("tickets", tickets)
+    return ticket
 
 
 @router.get("/emails")
