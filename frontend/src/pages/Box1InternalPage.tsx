@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronUp, ChevronRight, FolderOpen, Folder } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
-import DocumentTable from '../components/DocumentTable'
+import DocumentSections from '../components/DocumentSections'
 import BoxRequirements from '../components/BoxRequirements'
 import type { InternalDocument } from '../types'
 
@@ -49,7 +49,8 @@ export default function Box1InternalPage() {
                 {(() => {
                   const folders = [...new Set(docs.filter((d) => d.folder).map((d) => d.folder as string))]
                   const loose = docs.filter((d) => !d.folder)
-                  if (folders.length === 0) return <DocumentTable documents={docs} onChanged={refresh} />
+                  if (folders.length === 0)
+                    return <DocumentSections documents={docs} category={category} onChanged={refresh} />
                   return (
                     <div className="space-y-2">
                       {folders.map((folder) => {
@@ -78,13 +79,20 @@ export default function Box1InternalPage() {
                             </button>
                             {folderOpen && (
                               <div className="px-4 pb-4 border-t border-slate-100 pt-2">
-                                <DocumentTable documents={folderDocs} onChanged={refresh} />
+                                <DocumentSections
+                                  documents={folderDocs}
+                                  category={category}
+                                  folder={folder}
+                                  onChanged={refresh}
+                                />
                               </div>
                             )}
                           </div>
                         )
                       })}
-                      {loose.length > 0 && <DocumentTable documents={loose} onChanged={refresh} />}
+                      {loose.length > 0 && (
+                        <DocumentSections documents={loose} category={category} onChanged={refresh} />
+                      )}
                     </div>
                   )
                 })()}
