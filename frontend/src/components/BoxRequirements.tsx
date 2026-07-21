@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronUp, ChevronRight, Folder, FolderOpen, Upload, PlugZap, FileCheck2 } from 'lucide-react'
+import { ChevronUp, ChevronRight, Folder, FolderOpen, Upload, PlugZap, FileCheck2, Link2 as LinkIcon } from 'lucide-react'
 import client from '../api/client'
 import StatusBadge from './StatusBadge'
 import type { AnnexureGroup, AnnexureItem } from '../types'
@@ -44,53 +44,80 @@ function ItemRow({ item, onChanged }: { item: AnnexureItem; onChanged: () => voi
     }
   }
 
+  const linked = item.linked_docs_folder
+  const linkedDocs = item.linked_documents ?? []
+
   return (
     <div className="flex items-center justify-between gap-3 text-sm border-b border-slate-50 pb-1.5">
       <div className="min-w-0">
         <div className="text-slate-700">{item.item_name}</div>
-        {item.source && (
-          <div className="flex items-center gap-1 text-xs mt-0.5 text-slate-400">
-            <FileCheck2 size={11} className={item.source === 'nawras' ? 'text-teal-600' : 'text-sky-600'} />
-            <span className={item.source === 'nawras' ? 'text-teal-600 font-medium' : 'text-sky-600 font-medium'}>
-              {item.source === 'nawras' ? 'NAWRAS ERP' : 'Uploaded'}
+        {linked ? (
+          <div className="flex items-center flex-wrap gap-1 text-xs mt-0.5">
+            <LinkIcon size={11} className="text-indigo-500" />
+            <span className="text-indigo-600 font-medium">
+              {linkedDocs.length} from Box 1 · {linked}
             </span>
-            <span className="truncate">· {item.filename}</span>
-            {item.populated_at && <span>· {item.populated_at}</span>}
+            {linkedDocs.length > 0 && (
+              <span className="text-slate-400 truncate">
+                — {linkedDocs.map((d) => d.name.replace(/^Loan Agreement - /, '')).join(', ')}
+              </span>
+            )}
           </div>
+        ) : (
+          item.source && (
+            <div className="flex items-center gap-1 text-xs mt-0.5 text-slate-400">
+              <FileCheck2 size={11} className={item.source === 'nawras' ? 'text-teal-600' : 'text-sky-600'} />
+              <span className={item.source === 'nawras' ? 'text-teal-600 font-medium' : 'text-sky-600 font-medium'}>
+                {item.source === 'nawras' ? 'NAWRAS ERP' : 'Uploaded'}
+              </span>
+              <span className="truncate">· {item.filename}</span>
+              {item.populated_at && <span>· {item.populated_at}</span>}
+            </div>
+          )
         )}
       </div>
       <div className="flex items-center gap-1.5 shrink-0">
-        {item.nawras_applicable !== false && (
-          <button
-            onClick={pullNawras}
-            disabled={busy}
-            title="Auto-populate this report directly from the NAWRAS ERP (API connector)"
-            className="flex items-center gap-1 rounded-lg border border-teal-300 bg-teal-50 text-teal-700 text-[11px] px-2 py-1 hover:bg-teal-100 disabled:opacity-50"
-          >
-            <PlugZap size={12} /> NAWRAS
-          </button>
+        {linked ? (
+          <span className="flex items-center gap-1 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 text-[11px] px-2 py-1">
+            <LinkIcon size={12} /> Linked to Box 1
+          </span>
+        ) : (
+          <>
+            {item.nawras_applicable !== false && (
+              <button
+                onClick={pullNawras}
+                disabled={busy}
+                title="Auto-populate this report directly from the NAWRAS ERP (API connector)"
+                className="flex items-center gap-1 rounded-lg border border-teal-300 bg-teal-50 text-teal-700 text-[11px] px-2 py-1 hover:bg-teal-100 disabled:opacity-50"
+              >
+                <PlugZap size={12} /> NAWRAS
+              </button>
+            )}
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={busy}
+              title="Upload a document for this item"
+              className="flex items-center gap-1 rounded-lg border border-slate-200 text-slate-600 text-[11px] px-2 py-1 hover:border-sky-300 hover:text-sky-700 disabled:opacity-50"
+            >
+              <Upload size={12} /> Upload
+            </button>
+            <input ref={fileRef} type="file" className="hidden" onChange={onFile} />
+          </>
         )}
-        <button
-          onClick={() => fileRef.current?.click()}
-          disabled={busy}
-          title="Upload a document for this item"
-          className="flex items-center gap-1 rounded-lg border border-slate-200 text-slate-600 text-[11px] px-2 py-1 hover:border-sky-300 hover:text-sky-700 disabled:opacity-50"
-        >
-          <Upload size={12} /> Upload
-        </button>
-        <input ref={fileRef} type="file" className="hidden" onChange={onFile} />
         <StatusBadge status={item.status} />
-        <select
-          value={item.status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="rounded-lg border border-slate-200 px-1.5 py-0.5 text-xs"
-        >
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </select>
+        {!linked && (
+          <select
+            value={item.status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="rounded-lg border border-slate-200 px-1.5 py-0.5 text-xs"
+          >
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
     </div>
   )

@@ -288,7 +288,7 @@ MODULE_REPORTS = [
 # Full required-reports list (PBC), organised exactly as the client's "List of Req" file:
 # each row is assigned to a Box and to a named sub-folder within that box.
 # (box, folder, note_or_None, [item_names...])
-ANNEXURE_VERSION = 11
+ANNEXURE_VERSION = 12
 
 ANNEXURE = [
     # ---- Box 1 · Internal Documentation ----
@@ -571,11 +571,19 @@ def _seed_annexure_if_outdated() -> None:
                 status = "missing"
             else:
                 status = "reviewed" if len(annexure_items) % 3 == 0 else "uploaded"
+            # cross-link: Box 4 "Signed loan agreements" reads from the Box 1
+            # Contracts & agreements → Bank loan agreements folder (single source of truth)
+            linked_docs_folder = (
+                "Bank loan agreements"
+                if linked_box == "box4" and folder == "Borrowings" and item_name == "Signed loan agreements"
+                else None
+            )
             annexure_items.append(dict(
                 id=store.new_id(), linked_box=linked_box, folder=folder, folder_order=folder_order,
                 folder_note=note,
                 folder_group=(FOLDER_GROUPS.get(folder) if linked_box == "box4" else None),
                 nawras_applicable=folder not in NO_NAWRAS_FOLDERS,
+                linked_docs_folder=linked_docs_folder,
                 item_name=item_name, status=status,
             ))
     store.save("annexure_items", annexure_items)

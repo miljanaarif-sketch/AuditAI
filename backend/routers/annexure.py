@@ -17,10 +17,28 @@ def _slug(text: str) -> str:
     return "".join(keep).strip("_")[:40]
 
 
+def _enrich_linked(item: dict, documents: list[dict]) -> None:
+    """For items cross-linked to a Box 1 folder, pull in the current documents and
+    auto-derive status so the required item reflects what's already on file."""
+    folder = item.get("linked_docs_folder")
+    if not folder:
+        return
+    linked = [
+        {"name": d["name"], "filename": d.get("filename", ""), "doc_status": d.get("doc_status", "pending")}
+        for d in documents
+        if d.get("is_current") and d.get("folder") == folder
+    ]
+    item["linked_documents"] = linked
+    item["status"] = "reviewed" if linked else "missing"
+
+
 @router.get("/items")
 def list_items():
     """Grouped by box → folder (sub-folder), as laid out in the client 'List of Req' file."""
     items = store.load("annexure_items")
+    documents = store.load("documents")
+    for item in items:
+        _enrich_linked(item, documents)
     grouped: dict[str, dict] = {}
     for item in items:
         key = f"{item['linked_box']}::{item['folder']}"

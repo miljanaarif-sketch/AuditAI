@@ -135,6 +135,8 @@ export interface AnnexureItem {
   source?: 'upload' | 'nawras'
   filename?: string
   populated_at?: string
+  linked_docs_folder?: string | null
+  linked_documents?: { name: string; filename: string; doc_status: string }[]
 }
 
 export interface AnnexureGroup {
