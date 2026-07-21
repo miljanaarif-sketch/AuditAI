@@ -193,7 +193,7 @@ export default function SetupAccordion() {
         isOpen={open === section.key}
         onToggle={() => setOpen(open === section.key ? null : section.key)}
       >
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {section.fields.map(([field, label]) => (
             <div key={field}>
               <label className="block text-xs text-slate-500 mb-1">{label}</label>
@@ -237,7 +237,7 @@ export default function SetupAccordion() {
               </button>
               {openBank === i && (
                 <div className="px-4 pb-4 pt-1 border-t border-slate-100">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {BANK_FIELDS.map(([field, label]) => (
                       <div key={field}>
                         <label className="block text-xs text-slate-500 mb-1">{label}</label>

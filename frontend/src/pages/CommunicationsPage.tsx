@@ -107,12 +107,12 @@ export default function CommunicationsPage() {
         subtitle="Ticket queue for audit queries and requests, with a full message chain — plus the NAWRAS assistant."
       />
 
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Ticketing */}
-        <div className="col-span-2 space-y-4">
-          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+        <div className="lg:col-span-2 space-y-4 min-w-0">
+          <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto">
             {/* filter tabs */}
-            <div className="flex items-center gap-1 px-3 pt-3">
+            <div className="flex items-center gap-1 px-3 pt-3 flex-wrap">
               {FILTERS.map((f) => (
                 <button
                   key={f}

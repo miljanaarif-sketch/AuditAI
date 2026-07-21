@@ -22,36 +22,51 @@ const links = [
   { to: '/comms', label: 'Auditor Communications', icon: MessagesSquare },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
   return (
-    <aside className="w-72 shrink-0 bg-slate-900 text-slate-200 h-screen sticky top-0 overflow-y-auto flex flex-col">
-      <Link to="/" className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-800 hover:bg-slate-800/50 transition">
-        <img src={nawrasMark} alt="NAWRAS" className="h-9 w-auto shrink-0" />
-        <div>
-          <div className="text-lg font-bold text-white tracking-tight">NAWRAS</div>
-          <div className="text-xs font-medium text-emerald-400 mt-0.5 tracking-wide">Plan • Validate • Report</div>
+    <>
+      {/* mobile backdrop */}
+      {open && (
+        <div className="fixed inset-0 bg-slate-900/50 z-30 lg:hidden" onClick={onClose} aria-hidden="true" />
+      )}
+      <aside
+        className={`w-72 shrink-0 bg-slate-900 text-slate-200 h-screen overflow-y-auto flex flex-col z-40
+          fixed top-0 left-0 transition-transform duration-200 lg:sticky lg:translate-x-0
+          ${open ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <Link
+          to="/"
+          onClick={onClose}
+          className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-800 hover:bg-slate-800/50 transition"
+        >
+          <img src={nawrasMark} alt="NAWRAS" className="h-9 w-auto shrink-0" />
+          <div>
+            <div className="text-lg font-bold text-white tracking-tight">NAWRAS</div>
+            <div className="text-xs font-medium text-emerald-400 mt-0.5 tracking-wide">Plan • Validate • Report</div>
+          </div>
+        </Link>
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {links.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/dashboard'}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                  isActive ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`
+              }
+            >
+              <Icon size={17} />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="px-5 py-4 text-xs text-slate-500 border-t border-slate-800">
+          Five-Box Model prototype
         </div>
-      </Link>
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {links.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/dashboard'}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
-                isActive ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-              }`
-            }
-          >
-            <Icon size={17} />
-            {label}
-          </NavLink>
-        ))}
-      </nav>
-      <div className="px-5 py-4 text-xs text-slate-500 border-t border-slate-800">
-        Five-Box Model prototype
-      </div>
-    </aside>
+      </aside>
+    </>
   )
 }

@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
+import { Menu } from 'lucide-react'
 import Sidebar from './components/Sidebar'
+import nawrasMark from './assets/nawras-mark.png'
 import LaunchPage from './pages/LaunchPage'
 import DashboardPage from './pages/DashboardPage'
 import MasterDataPage from './pages/MasterDataPage'
@@ -11,12 +14,23 @@ import Box5ReportingPage from './pages/Box5ReportingPage'
 import CommunicationsPage from './pages/CommunicationsPage'
 
 function AppLayout() {
+  const [navOpen, setNavOpen] = useState(false)
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <Sidebar />
-      <main className="flex-1 p-8 max-w-6xl">
-        <Outlet />
-      </main>
+      <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
+      <div className="flex-1 min-w-0">
+        {/* mobile top bar with hamburger */}
+        <div className="lg:hidden sticky top-0 z-30 flex items-center gap-3 h-14 bg-slate-900 text-white px-4">
+          <button onClick={() => setNavOpen(true)} aria-label="Open menu" className="p-1 -ml-1">
+            <Menu size={22} />
+          </button>
+          <img src={nawrasMark} alt="" className="h-7 w-auto" />
+          <span className="font-bold tracking-tight">NAWRAS</span>
+        </div>
+        <main className="p-4 lg:p-8 max-w-6xl">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

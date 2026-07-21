@@ -78,7 +78,7 @@ export default function LaunchPage() {
         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-medium px-3 py-1.5 mb-6">
           <Sparkles size={13} /> End-to-end audit automation
         </div>
-        <h1 className="text-5xl font-bold tracking-tight leading-tight mb-6">
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight mb-6">
           The audit platform where
           <br />
           <span className="text-emerald-400">every number opens to its source.</span>
@@ -106,7 +106,7 @@ export default function LaunchPage() {
 
       {/* Stats */}
       <section className="border-y border-slate-800 bg-slate-900/50">
-        <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-4 gap-6">
+        <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map((s) => (
             <div key={s.label} className="text-center">
               <div className="text-3xl font-bold text-emerald-400">{s.value}</div>
@@ -125,7 +125,7 @@ export default function LaunchPage() {
             one evidence chain, no repeated document requests.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {FEATURES.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
@@ -143,7 +143,7 @@ export default function LaunchPage() {
 
       {/* Trust band */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="rounded-2xl border border-slate-800 bg-gradient-to-r from-emerald-500/10 to-slate-900 p-10 flex items-center justify-between">
+        <div className="rounded-2xl border border-slate-800 bg-gradient-to-r from-emerald-500/10 to-slate-900 p-6 lg:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div className="flex items-center gap-4">
             <span className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400">
               <Link2 size={24} />
