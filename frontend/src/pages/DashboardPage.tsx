@@ -46,6 +46,36 @@ const BOXES = [
   },
 ]
 
+// Five box cards graded across the NAWRAS logo gradient: light green → peacock blue.
+// Each card darkens on press (active: / group-active:).
+const CARD_STYLES = [
+  {
+    card: 'bg-emerald-50 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-100 active:bg-emerald-300 active:border-emerald-600',
+    icon: 'bg-emerald-100 text-emerald-700 group-hover:bg-emerald-200 group-active:bg-emerald-700 group-active:text-white',
+    arrow: 'text-emerald-600',
+  },
+  {
+    card: 'bg-teal-50 border-teal-200 hover:border-teal-400 hover:bg-teal-100 active:bg-teal-300 active:border-teal-600',
+    icon: 'bg-teal-100 text-teal-700 group-hover:bg-teal-200 group-active:bg-teal-700 group-active:text-white',
+    arrow: 'text-teal-600',
+  },
+  {
+    card: 'bg-cyan-50 border-cyan-200 hover:border-cyan-400 hover:bg-cyan-100 active:bg-cyan-300 active:border-cyan-600',
+    icon: 'bg-cyan-100 text-cyan-700 group-hover:bg-cyan-200 group-active:bg-cyan-700 group-active:text-white',
+    arrow: 'text-cyan-600',
+  },
+  {
+    card: 'bg-sky-50 border-sky-200 hover:border-sky-400 hover:bg-sky-100 active:bg-sky-300 active:border-sky-600',
+    icon: 'bg-sky-100 text-sky-700 group-hover:bg-sky-200 group-active:bg-sky-700 group-active:text-white',
+    arrow: 'text-sky-600',
+  },
+  {
+    card: 'bg-blue-50 border-blue-200 hover:border-blue-400 hover:bg-blue-100 active:bg-blue-300 active:border-blue-700',
+    icon: 'bg-blue-100 text-blue-700 group-hover:bg-blue-200 group-active:bg-blue-800 group-active:text-white',
+    arrow: 'text-blue-600',
+  },
+]
+
 const PRIORITY_DOT: Record<string, string> = {
   high: 'bg-rose-500',
   medium: 'bg-amber-400',
@@ -113,22 +143,27 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4 mb-8">
-        {BOXES.map(({ to, icon: Icon, title, subtitle }) => (
-          <Link
-            key={to}
-            to={to}
-            className="group rounded-2xl border-2 p-5 transition shadow-sm hover:shadow-md flex flex-col gap-3 bg-emerald-50 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-100 active:bg-emerald-200 active:border-emerald-600"
-          >
-            <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 group-hover:bg-emerald-200 group-active:bg-emerald-700 group-active:text-white transition">
-              <Icon size={22} />
-            </span>
-            <div className="flex-1">
-              <div className="font-semibold text-slate-900">{title}</div>
-              <div className="text-xs text-slate-500 mt-1 leading-relaxed">{subtitle}</div>
-            </div>
-            <ArrowRight size={16} className="text-emerald-600 opacity-0 group-hover:opacity-100 transition" />
-          </Link>
-        ))}
+        {BOXES.map(({ to, icon: Icon, title, subtitle }, i) => {
+          const c = CARD_STYLES[i]
+          return (
+            <Link
+              key={to}
+              to={to}
+              className={`group rounded-2xl border-2 p-5 transition shadow-sm hover:shadow-md flex flex-col gap-3 ${c.card}`}
+            >
+              <span
+                className={`flex items-center justify-center w-11 h-11 rounded-xl transition ${c.icon}`}
+              >
+                <Icon size={22} />
+              </span>
+              <div className="flex-1">
+                <div className="font-semibold text-slate-900">{title}</div>
+                <div className="text-xs text-slate-500 mt-1 leading-relaxed">{subtitle}</div>
+              </div>
+              <ArrowRight size={16} className={`${c.arrow} opacity-0 group-hover:opacity-100 transition`} />
+            </Link>
+          )
+        })}
       </div>
 
       {summary && (
