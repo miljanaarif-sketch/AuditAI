@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Mail, MailCheck, ChevronUp, ChevronRight, Users, Truck, Landmark, Scale, Handshake, Check, Upload, FileCheck2 } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
-import BoxRequirements from '../components/BoxRequirements'
 import StatusBadge from '../components/StatusBadge'
 import { formatSAR } from '../utils/format'
 import type { Confirmation, MailLogEntry } from '../types'
@@ -388,8 +387,6 @@ export default function Box2ExternalPage() {
           </div>
         </div>
       )}
-
-      <BoxRequirements box="box2" />
     </div>
   )
 }
