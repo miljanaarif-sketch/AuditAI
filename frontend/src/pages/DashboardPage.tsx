@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FolderKey, Send, BookOpenCheck, GitCompareArrows, FileBarChart, ArrowRight } from 'lucide-react'
+import { FolderKey, Send, BookOpenCheck, GitCompareArrows, FileBarChart, ArrowRight, Building2 } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
 import type { DashboardSummary } from '../types'
+
+// Group entities for the company drill-down (parent + subsidiaries)
+const GROUP_COMPANIES = [
+  'Obeikan Investment Group (parent)',
+  'Obeikan Plastic',
+  'Obeikan Glass Co.',
+  'Obeikan Paper Industries',
+]
 
 const BOXES = [
   {
@@ -62,14 +70,47 @@ function SegmentedBar({ pct }: { pct: number }) {
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
+  const [company, setCompany] = useState<string>(() => localStorage.getItem('nawras_company') ?? '')
 
   useEffect(() => {
     client.get('/dashboard/summary').then((res) => setSummary(res.data))
   }, [])
 
+  function selectCompany(c: string) {
+    setCompany(c)
+    if (c) localStorage.setItem('nawras_company', c)
+    else localStorage.removeItem('nawras_company')
+  }
+
   return (
     <div>
       <Header title="Dashboard" subtitle="FY2025" />
+
+      <div className="flex items-center gap-3 mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3">
+        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-600">
+          <Building2 size={18} />
+        </span>
+        <div>
+          <div className="text-xs text-slate-500 mb-0.5">Entity</div>
+          <select
+            value={company}
+            onChange={(e) => selectCompany(e.target.value)}
+            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-800"
+          >
+            <option value="">Select entity…</option>
+            {GROUP_COMPANIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+        {company && (
+          <span className="ml-auto text-sm text-slate-700">
+            <span className="font-semibold">{company}</span> · FY2025
+          </span>
+        )}
+      </div>
 
       <div className="grid grid-cols-5 gap-4 mb-8">
         {BOXES.map(({ to, icon: Icon, title, subtitle }) => (
