@@ -29,6 +29,10 @@ const INSTRUCTIONS = [
     title: 'Income-statement drill-down',
     text: 'Every income-statement line traces down to its supporting schedules, the general ledger and the source documents behind it, pulled directly through the API.',
   },
+  {
+    title: 'Balance-sheet drill-down',
+    text: 'Every balance-sheet line traces down to its account, the movement schedule behind it and the supporting evidence — source documents and third-party confirmations — pulled directly through the API.',
+  },
 ]
 
 export default function Box3LedgerPage() {
