@@ -146,7 +146,7 @@ LEGAL = [
 # (document name, folder, status, level) — folder groups big lists inside a category;
 # status: uploaded (green) / pending (red) / expired (yellow) / oig (blue, provided at parent level);
 # OIG (parent) level is used ONLY for Group policies; everything else is BU. level: OIG / BU
-DOCUMENTS_VERSION = 6
+DOCUMENTS_VERSION = 7
 
 INTERNAL_DOCS = {
     "Legal pack": [
@@ -182,7 +182,8 @@ INTERNAL_DOCS = {
         ("Service Agreement - IT Managed Services", "Service agreements", "uploaded", "BU"),
         ("Service Agreement - Security Services", "Service agreements", "uploaded", "BU"),
         ("Service Agreement - Facility Maintenance", "Service agreements", "expired", "BU"),
-        ("Loan Agreement - Riyadh Bank", "Other agreements", "uploaded", "BU"),
+        ("Loan Agreement - Riyadh Bank", "Bank loan agreements", "uploaded", "BU"),
+        ("Loan Agreement - Arab National Bank (ANB)", "Bank loan agreements", "uploaded", "BU"),
     ],
     "Structure and governance": [
         ("Organization Chart", None, "uploaded", "BU"),

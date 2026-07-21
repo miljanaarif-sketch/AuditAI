@@ -18,6 +18,12 @@ class DocumentUpdate(BaseModel):
     owner: str | None = None
     owner_email: str | None = None
 
+
+class AddEntry(BaseModel):
+    category: str
+    name: str
+    folder: str | None = None
+
 CATEGORIES = ["Legal pack", "Group policies", "Contracts and agreements", "Structure and governance"]
 
 
@@ -107,6 +113,22 @@ def send_reminder(document_id: str):
     emails.insert(0, record)
     store.save("comms_emails", emails)
     return record
+
+
+@router.post("/documents/add-entry")
+def add_entry(body: AddEntry):
+    """Add a document placeholder one-by-one (no file yet) — e.g. a new bank loan
+    agreement. The file can be uploaded later from the Document Database tab."""
+    docs = store.load("documents")
+    owner, owner_email = DOC_OWNERS.get(body.category, ("", ""))
+    new_doc = dict(
+        id=store.new_id(), category=body.category, name=body.name, version=1,
+        filename="", uploaded_at="—", is_current=True,
+        owner=owner, owner_email=owner_email, folder=body.folder, doc_status="pending", level="BU",
+    )
+    docs.append(new_doc)
+    store.save("documents", docs)
+    return new_doc
 
 
 @router.post("/documents/upload")

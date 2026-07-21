@@ -21,19 +21,28 @@ export default function DocumentSections({
   const [busy, setBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  async function upload() {
-    if (!file || !name) return
+  function reset() {
+    setName('')
+    setFile(null)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  async function submit() {
+    if (!name) return
     setBusy(true)
-    const form = new FormData()
-    form.append('category', category)
-    form.append('name', name)
-    form.append('file', file)
-    if (folder) form.append('folder', folder)
     try {
-      await client.post('/box1/documents/upload', form)
-      setName('')
-      setFile(null)
-      if (fileRef.current) fileRef.current.value = ''
+      if (file) {
+        const form = new FormData()
+        form.append('category', category)
+        form.append('name', name)
+        form.append('file', file)
+        if (folder) form.append('folder', folder)
+        await client.post('/box1/documents/upload', form)
+      } else {
+        // add the entry one-by-one; the file can be attached later
+        await client.post('/box1/documents/add-entry', { category, name, folder: folder ?? null })
+      }
+      reset()
       onChanged()
     } finally {
       setBusy(false)
@@ -74,11 +83,12 @@ export default function DocumentSections({
               className="text-sm max-w-[220px]"
             />
             <button
-              onClick={upload}
-              disabled={busy || !file || !name}
+              onClick={submit}
+              disabled={busy || !name}
+              title={file ? 'Upload the selected file' : 'Add entry now, attach the file later'}
               className="flex items-center gap-1.5 rounded-lg bg-sky-600 text-white text-sm px-3 py-1.5 hover:bg-sky-700 disabled:opacity-50"
             >
-              <Upload size={14} /> Upload
+              <Upload size={14} /> {file ? 'Upload' : 'Add entry'}
             </button>
           </div>
 
