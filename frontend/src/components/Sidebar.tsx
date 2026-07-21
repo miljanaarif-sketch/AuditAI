@@ -1,4 +1,5 @@
 import { NavLink, Link } from 'react-router-dom'
+import nawrasMark from '../assets/nawras-mark.png'
 import {
   LayoutDashboard,
   Settings2,
@@ -24,9 +25,12 @@ const links = [
 export default function Sidebar() {
   return (
     <aside className="w-72 shrink-0 bg-slate-900 text-slate-200 h-screen sticky top-0 overflow-y-auto flex flex-col">
-      <Link to="/" className="block px-5 py-5 border-b border-slate-800 hover:bg-slate-800/50 transition">
-        <div className="text-lg font-bold text-white tracking-tight">NAWRAS</div>
-        <div className="text-xs font-medium text-emerald-400 mt-0.5 tracking-wide">Plan • Validate • Report</div>
+      <Link to="/" className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-800 hover:bg-slate-800/50 transition">
+        <img src={nawrasMark} alt="NAWRAS" className="h-9 w-auto shrink-0" />
+        <div>
+          <div className="text-lg font-bold text-white tracking-tight">NAWRAS</div>
+          <div className="text-xs font-medium text-emerald-400 mt-0.5 tracking-wide">Plan • Validate • Report</div>
+        </div>
       </Link>
       <nav className="flex-1 px-3 py-4 space-y-1">
         {links.map(({ to, label, icon: Icon }) => (

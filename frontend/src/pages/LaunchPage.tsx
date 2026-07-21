@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import nawrasMark from '../assets/nawras-mark.png'
 import {
   ArrowRight,
   FolderKey,
@@ -57,9 +58,12 @@ export default function LaunchPage() {
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Nav */}
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-6 py-5">
-        <div>
-          <div className="text-xl font-bold tracking-tight">NAWRAS</div>
-          <div className="text-xs font-medium text-emerald-400 tracking-wide">Plan • Validate • Report</div>
+        <div className="flex items-center gap-3">
+          <img src={nawrasMark} alt="NAWRAS" className="h-10 w-auto" />
+          <div>
+            <div className="text-xl font-bold tracking-tight">NAWRAS</div>
+            <div className="text-xs font-medium text-emerald-400 tracking-wide">Plan • Validate • Report</div>
+          </div>
         </div>
         <Link
           to="/dashboard"
