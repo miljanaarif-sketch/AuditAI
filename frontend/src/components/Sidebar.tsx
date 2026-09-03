@@ -8,6 +8,7 @@ import {
   BookOpenCheck,
   GitCompareArrows,
   FileBarChart,
+  ClipboardList,
   MessagesSquare,
 } from 'lucide-react'
 
@@ -19,6 +20,7 @@ const links = [
   { to: '/box3', label: '3 · General Ledger', icon: BookOpenCheck },
   { to: '/box4', label: '4 · Integrated Reports & Recons', icon: GitCompareArrows },
   { to: '/box5', label: '5 · Financial Reporting', icon: FileBarChart },
+  { to: '/tracker', label: 'Audit Report Tracker', icon: ClipboardList },
   { to: '/comms', label: 'Auditor Communications', icon: MessagesSquare },
 ]
 

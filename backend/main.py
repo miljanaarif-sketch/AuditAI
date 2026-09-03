@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from services.seed_data import seed_if_empty
-from routers import box1_internal, box2_external, box3_ledger, box4_modules, box5_reporting, annexure, dashboard, setup, comms
+from routers import box1_internal, box2_external, box3_ledger, box4_modules, box5_reporting, annexure, dashboard, setup, comms, consolidation, audit_tracker
 
 seed_if_empty()
 
@@ -25,6 +25,8 @@ app.include_router(box4_modules.router)
 app.include_router(box5_reporting.router)
 app.include_router(annexure.router)
 app.include_router(comms.router)
+app.include_router(consolidation.router)
+app.include_router(audit_tracker.router)
 
 
 @app.get("/")

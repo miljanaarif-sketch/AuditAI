@@ -19,6 +19,8 @@
     { "source": "/box5/(.*)", "destination": "/api" },
     { "source": "/annexure/(.*)", "destination": "/api" },
     { "source": "/comms/(.*)", "destination": "/api" },
+    { "source": "/consolidation/(.*)", "destination": "/api" },
+    { "source": "/tracker/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

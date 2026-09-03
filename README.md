@@ -7,10 +7,10 @@ End-to-end prototype of the Five-Box Model audit platform described in the
 ## Quick start
 
 Double-click `start_all.bat` (or run `start_backend.bat` and `start_frontend.bat`
-in two terminals), then open **http://localhost:5174** — the NAWRAS launch page; click **Enter Platform** for the dashboard.
+in two terminals), then open **http://localhost:6555** — the NAWRAS launch page; click **Enter Platform** for the dashboard.
 
-- Backend: FastAPI on http://localhost:8000 (interactive API docs at `/docs`)
-- Frontend: React + Vite on http://localhost:5174
+- Backend: FastAPI on http://localhost:8010 (interactive API docs at `/docs`)
+- Frontend: React + Vite on http://localhost:6555
 
 ## The Five Boxes
 
