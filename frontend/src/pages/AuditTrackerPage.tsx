@@ -174,7 +174,7 @@ export default function AuditTrackerPage() {
                 </td>
                 <td className="py-2 pr-4">
                   {i.covered ? (
-                    <Link to="/consolidation" className="flex items-center gap-1 text-xs text-teal-700 hover:underline">
+                    <Link to={i.covered === 'Box 4' ? '/box4' : '/box5'} className="flex items-center gap-1 text-xs text-teal-700 hover:underline">
                       {i.covered} <ExternalLink size={11} />
                     </Link>
                   ) : (

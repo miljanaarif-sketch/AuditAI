@@ -2,6 +2,7 @@ import { Construction } from 'lucide-react'
 import Header from '../components/Header'
 import BoxRequirements from '../components/BoxRequirements'
 import BankReconciliationPanel from '../components/BankReconciliation'
+import IntegratedReportsTracker from '../components/IntegratedReportsTracker'
 
 export default function Box4ModulesPage() {
   return (
@@ -14,6 +15,8 @@ export default function Box4ModulesPage() {
       <BankReconciliationPanel />
 
       <BoxRequirements box="box4" title="Required Integrated Reports" />
+
+      <IntegratedReportsTracker />
 
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 flex items-start gap-4 mt-6">
         <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-amber-50 text-amber-500 shrink-0">
