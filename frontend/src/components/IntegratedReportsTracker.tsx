@@ -19,12 +19,12 @@ const statusColor = (v: string) =>
 const statusText = (v: string) => (v ? v : '✓ ready')
 
 const CATS: [string, RegExp][] = [
-  ['Reconciliations & Controls', /recon|exceptional|control/i],
+  ['Employee Cost', /emp |emp\.|payroll|employee|vacation|ticket|end of service/i],
   ['VAT & Tax', /vat|zakat|tax|e-invoice|wht/i],
-  ['Receivables & Payables', /aging|receivable|payable|customer|supplier|advance|soa|statement of account|sales by|purchase analysis|ecl|invoice/i],
   ['Inventory', /inventor|item movement/i],
   ['Fixed Assets', /fixed asset|fa movement|negative fixed|asset movement/i],
-  ['Employee Cost', /emp |payroll|employee|vacation|ticket|end of service/i],
+  ['Receivables & Payables', /aging|receivable|payable|customer|supplier|advance|soa|statement of account|sales by|purchase analysis|ecl|invoice/i],
+  ['Reconciliations & Controls', /recon|exceptional|control/i],
   ['Movements, GL & Other', /.*/],
 ]
 function categorize(name: string): string {

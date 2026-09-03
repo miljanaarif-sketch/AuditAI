@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Building2, Layers, FileText, Printer, ChevronDown, ChevronUp, Network, Grid3x3, PieChart } from 'lucide-react'
+import { Building2, Layers, FileText, Printer, ChevronDown, ChevronUp, Network, Grid3x3, PieChart, Handshake } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
 
@@ -256,7 +256,7 @@ function NoteLines({ lines }: { lines: [string, number | null, number | null][] 
 }
 
 export default function ConsolidationPage({ embedded = false }: { embedded?: boolean }) {
-  const [tab, setTab] = useState<'statements' | 'worksheets' | 'segments' | 'group' | 'notes'>('statements')
+  const [tab, setTab] = useState<'statements' | 'worksheets' | 'segments' | 'related' | 'group' | 'notes'>('statements')
   const [group, setGroup] = useState<Group | null>(null)
   const [entities, setEntities] = useState<Entity[]>([])
   const [statements, setStatements] = useState<Statement[]>([])
@@ -268,6 +268,8 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
   const [ws, setWs] = useState<Ws | null>(null)
   const [segKey, setSegKey] = useState('SEG_IS')
   const [segWs, setSegWs] = useState<Ws | null>(null)
+  const [rpKey, setRpKey] = useState('RP_BALANCES')
+  const [rpWs, setRpWs] = useState<Ws | null>(null)
   const [scope, setScope] = useState('OIG Consolidation')
   const [isWs, setIsWs] = useState<Ws | null>(null)
   const [bsWs, setBsWs] = useState<Ws | null>(null)
@@ -297,6 +299,11 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
     setSegWs(null)
     client.get(`/consolidation/worksheets/${segKey}`).then((r) => setSegWs(r.data))
   }, [segKey])
+
+  useEffect(() => {
+    setRpWs(null)
+    client.get(`/consolidation/worksheets/${rpKey}`).then((r) => setRpWs(r.data))
+  }, [rpKey])
 
   const noteCats = ['Policy & framework', 'Balance-sheet notes', 'Income-statement notes', 'Group & disclosure notes']
 
@@ -375,6 +382,7 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
           { k: 'statements', label: 'Primary Statements', icon: FileText },
           { k: 'worksheets', label: 'Consolidation Worksheets', icon: Grid3x3 },
           { k: 'segments', label: 'Segments', icon: PieChart },
+          { k: 'related', label: 'Related Party & IC', icon: Handshake },
           { k: 'group', label: 'Group Structure', icon: Network },
           { k: 'notes', label: 'Notes', icon: Layers },
         ].map(({ k, label, icon: Icon }) => (
@@ -437,7 +445,7 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
       {tab === 'worksheets' && (
         <div>
           <div className="flex items-center gap-1.5 mb-3 flex-wrap">
-            {wsIndex.filter((w) => !w.key.startsWith('SEG')).map((w) => (
+            {wsIndex.filter((w) => !w.key.startsWith('SEG') && w.key !== 'IC_SALES' && w.key !== 'RP_BALANCES').map((w) => (
               <button
                 key={w.key}
                 onClick={() => setWsKey(w.key)}
@@ -489,6 +497,39 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
             </>
           ) : (
             <div className="text-sm text-slate-400 py-8">Loading segment report…</div>
+          )}
+        </div>
+      )}
+
+      {/* RELATED PARTY & INTERCOMPANY */}
+      {tab === 'related' && (
+        <div>
+          <div className="text-sm text-slate-600 mb-3">
+            Related-party & intercompany working papers — used for balance matching and elimination on consolidation.
+          </div>
+          <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+            {[
+              { k: 'RP_BALANCES', label: 'Related Party Balances & Matching' },
+              { k: 'IC_SALES', label: 'Intercompany Sales & Transactions' },
+            ].map((s) => (
+              <button
+                key={s.k}
+                onClick={() => setRpKey(s.k)}
+                className={`rounded-lg px-2.5 py-1 text-xs ${
+                  rpKey === s.k ? 'bg-teal-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-teal-300'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          {rpWs ? (
+            <>
+              <div className="text-xs text-slate-400 mb-2">{rpWs.subtitle} · {rpWs.columns.length} columns × {rpWs.rows.length} lines · scroll horizontally</div>
+              <WorksheetGrid ws={rpWs} />
+            </>
+          ) : (
+            <div className="text-sm text-slate-400 py-8">Loading…</div>
           )}
         </div>
       )}
