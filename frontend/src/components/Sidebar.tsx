@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router-dom'
-import nawrasMark from '../assets/nawras-mark.png'
+import nawrasLogo from '../assets/nawras-logo.png'
 import {
   LayoutDashboard,
   Settings2,
@@ -41,10 +41,10 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
           onClick={onClose}
           className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-800 hover:bg-slate-800/50 transition"
         >
-          <img src={nawrasMark} alt="NAWRAS" className="h-9 w-auto shrink-0" />
+          <img src={nawrasLogo} alt="NAWRAS" className="h-9 w-auto shrink-0" />
           <div>
-            <div className="text-lg font-bold text-white tracking-tight">NAWRAS</div>
-            <div className="text-xs font-medium text-emerald-400 mt-0.5 tracking-wide">Plan • Validate • Report</div>
+            <div className="font-baloo text-2xl lowercase leading-none text-white tracking-tight">nawras</div>
+            <div className="text-[11px] font-medium text-slate-400 mt-1 tracking-wide">Intelligent audit</div>
           </div>
         </Link>
         <nav className="flex-1 px-3 py-4 space-y-1">
@@ -56,7 +56,7 @@ export default function Sidebar({ open = false, onClose }: { open?: boolean; onC
               onClick={onClose}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
-                  isActive ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  isActive ? 'brand-grad brand-ring text-white font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`
               }
             >

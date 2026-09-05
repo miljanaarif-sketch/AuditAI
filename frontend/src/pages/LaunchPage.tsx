@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import nawrasMark from '../assets/nawras-mark.png'
+import nawrasLogo from '../assets/nawras-logo.png'
 import {
   ArrowRight,
   FolderKey,
@@ -59,15 +59,15 @@ export default function LaunchPage() {
       {/* Nav */}
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-6 py-5">
         <div className="flex items-center gap-3">
-          <img src={nawrasMark} alt="NAWRAS" className="h-10 w-auto" />
+          <img src={nawrasLogo} alt="NAWRAS" className="h-10 w-auto" />
           <div>
-            <div className="text-xl font-bold tracking-tight">NAWRAS</div>
-            <div className="text-xs font-medium text-emerald-400 tracking-wide">Plan • Validate • Report</div>
+            <div className="font-baloo text-2xl lowercase leading-none tracking-tight">nawras</div>
+            <div className="text-xs font-medium text-slate-400 tracking-wide mt-0.5">Intelligent audit</div>
           </div>
         </div>
         <Link
           to="/dashboard"
-          className="rounded-lg bg-emerald-500 text-slate-950 font-semibold text-sm px-4 py-2 hover:bg-emerald-400 transition"
+          className="rounded-lg brand-grad brand-ring text-white font-semibold text-sm px-4 py-2 hover:opacity-90 transition"
         >
           Enter Platform
         </Link>
@@ -78,10 +78,10 @@ export default function LaunchPage() {
         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-medium px-3 py-1.5 mb-6">
           <Sparkles size={13} /> End-to-end audit automation
         </div>
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight mb-6">
+        <h1 className="font-baloo text-3xl sm:text-5xl font-bold tracking-tight leading-tight mb-6">
           The audit platform where
           <br />
-          <span className="text-emerald-400">every number opens to its source.</span>
+          <span className="brand-text">every number opens to its source.</span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg text-slate-400 mb-10">
           NAWRAS connects the financial statements to the evidence behind them — documents,
@@ -91,7 +91,7 @@ export default function LaunchPage() {
         <div className="flex items-center justify-center gap-3">
           <Link
             to="/dashboard"
-            className="flex items-center gap-2 rounded-xl bg-emerald-500 text-slate-950 font-semibold px-6 py-3 hover:bg-emerald-400 transition"
+            className="flex items-center gap-2 rounded-xl brand-grad brand-ring text-white font-semibold px-6 py-3 hover:opacity-90 transition"
           >
             Enter Platform <ArrowRight size={17} />
           </Link>
@@ -109,7 +109,7 @@ export default function LaunchPage() {
         <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map((s) => (
             <div key={s.label} className="text-center">
-              <div className="text-3xl font-bold text-emerald-400">{s.value}</div>
+              <div className="font-baloo text-3xl font-bold brand-text">{s.value}</div>
               <div className="text-sm text-slate-400 mt-1">{s.label}</div>
             </div>
           ))}
@@ -157,7 +157,7 @@ export default function LaunchPage() {
           </div>
           <Link
             to="/box5"
-            className="flex items-center gap-2 rounded-xl bg-emerald-500 text-slate-950 font-semibold px-5 py-2.5 hover:bg-emerald-400 transition whitespace-nowrap"
+            className="flex items-center gap-2 rounded-xl brand-grad brand-ring text-white font-semibold px-5 py-2.5 hover:opacity-90 transition whitespace-nowrap"
           >
             See it live <ArrowRight size={16} />
           </Link>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import Sidebar from './components/Sidebar'
-import nawrasMark from './assets/nawras-mark.png'
+import nawrasLogo from './assets/nawras-logo.png'
 import LaunchPage from './pages/LaunchPage'
 import DashboardPage from './pages/DashboardPage'
 import MasterDataPage from './pages/MasterDataPage'
@@ -27,8 +27,8 @@ function AppLayout() {
           <button onClick={() => setNavOpen(true)} aria-label="Open menu" className="p-1 -ml-1">
             <Menu size={22} />
           </button>
-          <img src={nawrasMark} alt="" className="h-7 w-auto" />
-          <span className="font-bold tracking-tight">NAWRAS</span>
+          <img src={nawrasLogo} alt="" className="h-7 w-auto" />
+          <span className="font-baloo text-xl lowercase tracking-tight">nawras</span>
         </div>
         <main className="p-4 lg:p-8 max-w-6xl">
           <Outlet />

@@ -1,6 +1,30 @@
 @import "tailwindcss";
 
+/* NAWRAS brand theme (from Treasury Module) */
+:root {
+  --nblue: #1d5fe0;
+  --nemerald: #10b981;
+  --nmint: #16e08c;
+  --brandgrad: linear-gradient(120deg, #1d5fe0 0%, #12b981 55%, #22e08c 100%);
+}
+
 body {
   margin: 0;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-baloo {
+  font-family: 'Baloo 2', system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+.brand-grad {
+  background: var(--brandgrad);
+}
+.brand-text {
+  background: var(--brandgrad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.brand-ring {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 6px 16px -6px rgba(29, 95, 224, 0.6);
 }
