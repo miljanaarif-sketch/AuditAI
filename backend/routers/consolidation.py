@@ -1,8 +1,38 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Body, HTTPException
 
-from services import consol_data, consol_worksheets, rp_recon_data
+from services import consol_data, consol_worksheets, rp_recon_data, store
 
 router = APIRouter(prefix="/consolidation", tags=["Consolidation"])
+
+# Manual FX-rate control table — average rate (Income Statement), closing rate (Balance Sheet).
+FX_DEFAULT = {
+    "EUR": {"name": "Euro", "entity": "MDF Spain", "avg": 4.0, "closing": 4.05},
+    "EGP": {"name": "Egyptian Pound", "entity": "Egypt", "avg": 0.078, "closing": 0.076},
+    "USD": {"name": "US Dollar", "entity": "O3", "avg": 3.75, "closing": 3.75},
+    "CHF": {"name": "Swiss Franc", "entity": "KSA Service", "avg": 4.15, "closing": 4.2},
+}
+
+
+@router.get("/fx-rates")
+def get_fx_rates():
+    saved = store.load_obj("fx_rates")
+    return saved if saved else FX_DEFAULT
+
+
+@router.put("/fx-rates")
+def set_fx_rates(rates: dict = Body(...)):
+    """Persist the manually-entered FX control table."""
+    clean = {}
+    for cur, r in rates.items():
+        d = FX_DEFAULT.get(cur, {})
+        clean[cur] = {
+            "name": r.get("name", d.get("name", cur)),
+            "entity": r.get("entity", d.get("entity", "")),
+            "avg": float(r.get("avg") or 0),
+            "closing": float(r.get("closing") or 0),
+        }
+    store.save_obj("fx_rates", clean)
+    return {"ok": True, "rates": clean}
 
 
 def _is_agg(name: str) -> bool:
