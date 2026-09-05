@@ -1,8 +1,56 @@
 from fastapi import APIRouter, HTTPException
 
-from services import consol_data, consol_worksheets
+from services import consol_data, consol_worksheets, rp_recon_data
 
 router = APIRouter(prefix="/consolidation", tags=["Consolidation"])
+
+
+def _is_agg(name: str) -> bool:
+    n = name.strip().lower()
+    return (n.startswith("total") or "consolidation" in n or "head office" in n
+            or "affiliates and" in n or "grand" in n or n.startswith("net "))
+
+
+@router.get("/rp-recon")
+def rp_recon_companies():
+    """Companies that can be reconciled (intercompany current accounts)."""
+    return [{"key": c, "name": rp_recon_data.DISPLAY.get(c, c)}
+            for c in rp_recon_data.COMPANIES if not _is_agg(rp_recon_data.DISPLAY.get(c, c))]
+
+
+@router.get("/rp-recon/{company}")
+def rp_recon(company: str):
+    a = company.strip().lower()
+    if a not in rp_recon_data.DF:
+        raise HTTPException(404, "Unknown company")
+    DF, DT, disp = rp_recon_data.DF, rp_recon_data.DT, rp_recon_data.DISPLAY
+    rows = []
+    tot_deb = tot_cred = tot_dd = tot_dc = 0.0
+    counterparties = sorted(set(list(DF.get(a, {})) + [b for b in DF if a in DF.get(b, {})]))
+    for b in counterparties:
+        if b == a or _is_agg(disp.get(b, b)):
+            continue
+        debit = DF.get(a, {}).get(b, 0.0)          # A's due FROM B (A's books)
+        credit = DT.get(b, {}).get(a, 0.0)         # B's due TO A (B's books)
+        if not debit and not credit:
+            continue
+        diff = round(debit - credit, 2)
+        rows.append({
+            "code": b, "company": disp.get(b, b),
+            "debit": debit, "credit": credit,
+            "diff_debit": diff if diff > 0 else 0.0,
+            "diff_credit": -diff if diff < 0 else 0.0,
+        })
+        tot_deb += debit; tot_cred += credit
+        tot_dd += diff if diff > 0 else 0.0
+        tot_dc += -diff if diff < 0 else 0.0
+    rows.sort(key=lambda r: -(abs(r["debit"]) + abs(r["credit"])))
+    return {
+        "company": disp.get(a, a),
+        "rows": rows,
+        "totals": {"debit": round(tot_deb, 2), "credit": round(tot_cred, 2),
+                   "diff_debit": round(tot_dd, 2), "diff_credit": round(tot_dc, 2)},
+    }
 
 
 @router.get("/worksheets")

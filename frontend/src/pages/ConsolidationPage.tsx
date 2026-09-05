@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Building2, Layers, FileText, Printer, ChevronDown, ChevronUp, Network, Grid3x3, PieChart, Handshake } from 'lucide-react'
+import { Building2, Layers, FileText, Printer, ChevronDown, ChevronUp, Network, Grid3x3, PieChart, Handshake, Scale } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
 
@@ -24,6 +24,8 @@ type Ws = {
   key: string; title: string; subtitle: string; columns: string[]; consolidated: boolean[]
   rows: { label: string; kind: string; values: (number | null)[] }[]
 }
+type ReconRow = { code: string; company: string; debit: number; credit: number; diff_debit: number; diff_credit: number }
+type ReconData = { company: string; rows: ReconRow[]; totals: { debit: number; credit: number; diff_debit: number; diff_credit: number } }
 
 const KEYS = ['SOFP', 'PL', 'OCI', 'CF', 'SOCE']
 
@@ -256,7 +258,7 @@ function NoteLines({ lines }: { lines: [string, number | null, number | null][] 
 }
 
 export default function ConsolidationPage({ embedded = false }: { embedded?: boolean }) {
-  const [tab, setTab] = useState<'statements' | 'worksheets' | 'segments' | 'related' | 'group' | 'notes'>('statements')
+  const [tab, setTab] = useState<'statements' | 'worksheets' | 'segments' | 'related' | 'recon' | 'group' | 'notes'>('statements')
   const [group, setGroup] = useState<Group | null>(null)
   const [entities, setEntities] = useState<Entity[]>([])
   const [statements, setStatements] = useState<Statement[]>([])
@@ -269,6 +271,9 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
   const [segKey, setSegKey] = useState('SEG_IS')
   const [segWs, setSegWs] = useState<Ws | null>(null)
   const [rpKey, setRpKey] = useState('RP_BALANCES')
+  const [reconCos, setReconCos] = useState<{ key: string; name: string }[]>([])
+  const [reconCo, setReconCo] = useState('printing')
+  const [recon, setRecon] = useState<ReconData | null>(null)
   const [rpWs, setRpWs] = useState<Ws | null>(null)
   const [scope, setScope] = useState('OIG Consolidation')
   const [isWs, setIsWs] = useState<Ws | null>(null)
@@ -304,6 +309,14 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
     setRpWs(null)
     client.get(`/consolidation/worksheets/${rpKey}`).then((r) => setRpWs(r.data))
   }, [rpKey])
+
+  useEffect(() => {
+    client.get('/consolidation/rp-recon').then((r) => setReconCos(r.data))
+  }, [])
+  useEffect(() => {
+    setRecon(null)
+    client.get(`/consolidation/rp-recon/${reconCo}`).then((r) => setRecon(r.data))
+  }, [reconCo])
 
   const noteCats = ['Policy & framework', 'Balance-sheet notes', 'Income-statement notes', 'Group & disclosure notes']
 
@@ -383,6 +396,7 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
           { k: 'worksheets', label: 'Consolidation Worksheets', icon: Grid3x3 },
           { k: 'segments', label: 'Segments', icon: PieChart },
           { k: 'related', label: 'Related Party & IC', icon: Handshake },
+          { k: 'recon', label: 'Current-Acct Recon', icon: Scale },
           { k: 'group', label: 'Group Structure', icon: Network },
           { k: 'notes', label: 'Notes', icon: Layers },
         ].map(({ k, label, icon: Icon }) => (
@@ -530,6 +544,74 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
             </>
           ) : (
             <div className="text-sm text-slate-400 py-8">Loading…</div>
+          )}
+        </div>
+      )}
+
+      {/* CURRENT-ACCOUNT RECONCILIATION */}
+      {tab === 'recon' && (
+        <div>
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
+            <Scale size={16} className="text-slate-500" />
+            <label className="text-sm text-slate-600">Company (own books)</label>
+            <select
+              value={reconCo}
+              onChange={(e) => setReconCo(e.target.value)}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm min-w-[220px]"
+            >
+              {reconCos.map((c) => (
+                <option key={c.key} value={c.key}>{c.name}</option>
+              ))}
+            </select>
+            <span className="text-xs text-slate-400">
+              Intercompany current-account reconciliation — due-from (Debit) vs the counterparty's due-to (Credit), in SR
+            </span>
+          </div>
+          {recon ? (
+            <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto">
+              <table className="w-full text-sm min-w-[720px]">
+                <thead>
+                  <tr>
+                    <th className="bg-slate-700 text-white py-2 pl-4 text-left font-semibold">Company</th>
+                    <th className="bg-[#2c4d7a] text-white py-2 px-3 text-right font-semibold">{recon.company}'s Books</th>
+                    <th className="bg-[#2c4d7a] text-white py-2 px-3 text-right font-semibold">Other Company's Books</th>
+                    <th className="bg-slate-500 text-white py-2 px-3 text-center font-semibold" colSpan={2}>Differences</th>
+                  </tr>
+                  <tr className="bg-slate-100 border-b border-slate-300 text-xs text-slate-500">
+                    <th className="py-1.5 pl-4 text-left font-medium">&nbsp;</th>
+                    <th className="py-1.5 px-3 text-right font-medium">Debit</th>
+                    <th className="py-1.5 px-3 text-right font-medium">Credit</th>
+                    <th className="py-1.5 px-3 text-right font-medium">Debit</th>
+                    <th className="py-1.5 px-3 text-right font-medium">Credit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recon.rows.map((r, i) => (
+                    <tr key={i} className={`border-b border-slate-50 ${i % 2 ? 'bg-slate-50/60' : ''}`}>
+                      <td className="py-1.5 pl-4 font-semibold text-blue-900">{r.company}</td>
+                      <td className="py-1.5 px-3 text-right tabular-nums text-slate-700">{fmt(r.debit)}</td>
+                      <td className="py-1.5 px-3 text-right tabular-nums text-slate-700">{fmt(r.credit)}</td>
+                      <td className="py-1.5 px-3 text-right tabular-nums text-slate-700">{fmt(r.diff_debit)}</td>
+                      <td className="py-1.5 px-3 text-right tabular-nums text-rose-600">{fmt(r.diff_credit > 0 ? -r.diff_credit : 0)}</td>
+                    </tr>
+                  ))}
+                  {recon.rows.length === 0 && (
+                    <tr><td colSpan={5} className="py-6 text-center text-slate-400">No intercompany balances for this company.</td></tr>
+                  )}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-slate-800 text-white font-semibold">
+                    <td className="py-2 pl-4">Total Due From Related Parties / Difference</td>
+                    <td className="py-2 px-3 text-right tabular-nums">{fmt(recon.totals.debit)}</td>
+                    <td className="py-2 px-3 text-right tabular-nums">{fmt(recon.totals.credit)}</td>
+                    <td className="py-2 px-3 text-right tabular-nums">{fmt(recon.totals.diff_debit)}</td>
+                    <td className="py-2 px-3 text-right tabular-nums text-rose-300">{fmt(recon.totals.diff_credit > 0 ? -recon.totals.diff_credit : 0)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          ) : (
+            <div className="text-sm text-slate-400 py-8">Loading reconciliation…</div>
           )}
         </div>
       )}
