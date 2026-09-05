@@ -130,7 +130,8 @@ export default function FinancialImportPage() {
             {saved ? <><Check size={14} /> Saved</> : <><Save size={14} /> Save rates</>}
           </button>
         </div>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[540px]">
           <thead>
             <tr className="text-slate-500 bg-slate-50 border-b border-slate-200">
               <th className="py-2 pl-5 text-left font-medium">Entity</th>
@@ -161,6 +162,7 @@ export default function FinancialImportPage() {
             })}
           </tbody>
         </table>
+        </div>
         <div className="px-5 py-2 text-xs text-slate-400 border-t border-slate-100">
           Edit a rate and click Save — the translated figures below update immediately. 1 {ent.cur} = {rate.avg} SAR (avg) / {rate.closing} SAR (closing).
         </div>
