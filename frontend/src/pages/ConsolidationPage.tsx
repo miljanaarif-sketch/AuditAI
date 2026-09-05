@@ -115,12 +115,6 @@ function EquityStatement({ st }: { st: Statement }) {
   )
 }
 
-function colKind(label: string): 'scope' | 'subtotal' | 'entity' {
-  if (/(Consolidation|Standalone|CONSOLIDATED|UNCONSOLIDATED)/.test(label)) return 'scope'
-  if (/^(TOTAL|ELIMIN)/.test(label)) return 'subtotal'
-  return 'entity'
-}
-
 // consolidation roll-up scopes, in drill-down order
 const SCOPE_ORDER = [
   'OIG Consolidation',
