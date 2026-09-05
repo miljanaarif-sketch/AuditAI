@@ -26,16 +26,15 @@ function fmt(n: number | null | undefined): string {
   return r < 0 ? `(${s})` : s
 }
 
-function StmtTable({ ws, col, rate, cur, rateLabel }: { ws: Ws | null; col: number; rate: number; cur: string; rateLabel: string }) {
+function StmtTable({ ws, col, rate, cur }: { ws: Ws | null; col: number; rate: number; cur: string }) {
   if (!ws || col < 0) return null
   const rows = ws.rows
     .map((r) => ({ label: r.label, kind: r.kind, sar: r.values[col] ?? null }))
     .filter((r) => r.kind === 'header' || r.kind === 'total' || r.sar !== null)
   return (
     <div className="rounded-xl border border-slate-200 bg-white overflow-hidden mb-5">
-      <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+      <div className="px-5 py-3 border-b border-slate-100">
         <div className="text-sm font-semibold text-slate-800">{ws.title}</div>
-        <div className="text-xs text-slate-500">{rateLabel}: 1 {cur} = {rate || '—'} SAR</div>
       </div>
       <div className="px-5 py-3 overflow-x-auto">
         <table className="w-full text-sm max-w-3xl">
@@ -118,8 +117,8 @@ export default function FinancialImportPage() {
         ))}
       </div>
 
-      <StmtTable ws={isWs} col={col} rate={rate.avg} cur={ent.cur} rateLabel="Average rate (IS)" />
-      <StmtTable ws={bsWs} col={col} rate={rate.closing} cur={ent.cur} rateLabel="Closing rate (BS)" />
+      <StmtTable ws={isWs} col={col} rate={rate.avg} cur={ent.cur} />
+      <StmtTable ws={bsWs} col={col} rate={rate.closing} cur={ent.cur} />
 
       <div className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm text-slate-500 flex items-center gap-2">
         <ArrowRight size={15} className="text-emerald-600" />
