@@ -14,6 +14,7 @@ import Box5ReportingPage from './pages/Box5ReportingPage'
 import ConsolidationPage from './pages/ConsolidationPage'
 import AuditTrackerPage from './pages/AuditTrackerPage'
 import FinancialReportingPage from './pages/FinancialReportingPage'
+import FinancialImportPage from './pages/FinancialImportPage'
 import CommunicationsPage from './pages/CommunicationsPage'
 
 function AppLayout() {
@@ -50,6 +51,7 @@ function App() {
         <Route path="/box3" element={<Box3LedgerPage />} />
         <Route path="/box4" element={<Box4ModulesPage />} />
         <Route path="/box5" element={<Box5ReportingPage />} />
+        <Route path="/financial-import" element={<FinancialImportPage />} />
         <Route path="/consolidation" element={<ConsolidationPage />} />
         <Route path="/tracker" element={<AuditTrackerPage />} />
         <Route path="/financial-reporting" element={<FinancialReportingPage />} />
