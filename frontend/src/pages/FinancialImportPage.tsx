@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Globe, ArrowRight, Upload, Save, Check } from 'lucide-react'
+import { Globe, ArrowRight, Upload } from 'lucide-react'
 import client from '../api/client'
 import Header from '../components/Header'
 
@@ -10,7 +10,7 @@ type Ws = {
 type Rate = { name: string; entity: string; avg: number; closing: number }
 type Rates = Record<string, Rate>
 
-// entity → worksheet column + base currency (rates come from the editable control table)
+// entity → worksheet column + base currency
 const ENTITIES = [
   { key: 'OMDF', name: 'MDF Spain', cur: 'EUR', symbol: '€' },
   { key: 'Egypt OIG', name: 'Egypt', cur: 'EGP', symbol: 'E£' },
@@ -76,30 +76,16 @@ export default function FinancialImportPage() {
   const [bsWs, setBsWs] = useState<Ws | null>(null)
   const [entKey, setEntKey] = useState('OMDF')
   const [rates, setRates] = useState<Rates>({})
-  const [draft, setDraft] = useState<Rates>({})
-  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     client.get('/consolidation/worksheets/IS').then((r) => setIsWs(r.data))
     client.get('/consolidation/worksheets/BS').then((r) => setBsWs(r.data))
-    client.get('/consolidation/fx-rates').then((r) => { setRates(r.data); setDraft(r.data) })
+    client.get('/consolidation/fx-rates').then((r) => setRates(r.data))
   }, [])
 
   const ent = ENTITIES.find((e) => e.key === entKey)!
   const col = useMemo(() => (isWs ? isWs.columns.indexOf(entKey) : -1), [isWs, entKey])
   const rate = rates[ent.cur] || { avg: 0, closing: 0, name: ent.cur, entity: ent.name }
-
-  function editRate(cur: string, field: 'avg' | 'closing', value: string) {
-    setDraft((d) => ({ ...d, [cur]: { ...d[cur], [field]: parseFloat(value) || 0 } }))
-    setSaved(false)
-  }
-  async function saveRates() {
-    const r = await client.put('/consolidation/fx-rates', draft)
-    setRates(r.data.rates)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2500)
-  }
-  const dirty = JSON.stringify(rates) !== JSON.stringify(draft)
 
   return (
     <div>
@@ -114,58 +100,6 @@ export default function FinancialImportPage() {
           These four entities do not report through the NAWRAS ERP. Statements are imported in local currency and translated —
           <span className="font-semibold"> average rate for the Income Statement, closing rate for the Balance Sheet</span> — then connect to the OIG Consolidation.
         </span>
-      </div>
-
-      {/* FX control table — manual entry */}
-      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden mb-6">
-        <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-          <div className="text-sm font-semibold text-slate-800">FX rate control table <span className="font-normal text-slate-400">· manual entry (SAR per 1 unit)</span></div>
-          <button
-            onClick={saveRates}
-            disabled={!dirty}
-            className={`flex items-center gap-1.5 rounded-lg text-sm px-3 py-1.5 ${
-              dirty ? 'brand-grad brand-ring text-white hover:opacity-90' : 'bg-slate-100 text-slate-400'
-            }`}
-          >
-            {saved ? <><Check size={14} /> Saved</> : <><Save size={14} /> Save rates</>}
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[540px]">
-          <thead>
-            <tr className="text-slate-500 bg-slate-50 border-b border-slate-200">
-              <th className="py-2 pl-5 text-left font-medium">Entity</th>
-              <th className="py-2 px-3 text-left font-medium">Currency</th>
-              <th className="py-2 px-3 text-right font-medium w-44">Average rate (IS)</th>
-              <th className="py-2 px-3 text-right font-medium w-44">Closing rate (BS)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ENTITIES.map((e) => {
-              const d = draft[e.cur] || { avg: 0, closing: 0, name: e.cur, entity: e.name }
-              return (
-                <tr key={e.cur} className="border-b border-slate-100">
-                  <td className="py-2 pl-5 font-semibold text-slate-800">{e.name}</td>
-                  <td className="py-2 px-3 text-slate-600">{e.cur} <span className="text-slate-400">{e.symbol}</span></td>
-                  <td className="py-2 px-3 text-right">
-                    <input type="number" step="0.0001" value={d.avg}
-                      onChange={(ev) => editRate(e.cur, 'avg', ev.target.value)}
-                      className="w-32 rounded-lg border border-slate-200 px-2 py-1 text-right tabular-nums focus:border-emerald-400 outline-none" />
-                  </td>
-                  <td className="py-2 px-3 text-right">
-                    <input type="number" step="0.0001" value={d.closing}
-                      onChange={(ev) => editRate(e.cur, 'closing', ev.target.value)}
-                      className="w-32 rounded-lg border border-slate-200 px-2 py-1 text-right tabular-nums focus:border-emerald-400 outline-none" />
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-        </div>
-        <div className="px-5 py-2 text-xs text-slate-400 border-t border-slate-100">
-          Edit a rate and click Save — the translated figures below update immediately. 1 {ent.cur} = {rate.avg} SAR (avg) / {rate.closing} SAR (closing).
-        </div>
       </div>
 
       {/* entity drill-down */}
