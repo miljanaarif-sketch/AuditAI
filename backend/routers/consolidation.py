@@ -35,6 +35,42 @@ def set_fx_rates(rates: dict = Body(...)):
     return {"ok": True, "rates": clean}
 
 
+# Managed list of imported (non-NAWRAS) entities — key = worksheet data column.
+FX_ENTITIES_DEFAULT = [
+    {"key": "OMDF", "name": "MDF Spain", "cur": "EUR", "symbol": "€"},
+    {"key": "Egypt OIG", "name": "Egypt", "cur": "EGP", "symbol": "E£"},
+    {"key": "O3 Smart", "name": "O3", "cur": "USD", "symbol": "$"},
+    {"key": "KSA Services", "name": "KSA Service", "cur": "CHF", "symbol": "Fr"},
+]
+
+
+@router.get("/fx-entities")
+def get_fx_entities():
+    saved = store.load("fx_entities")
+    return saved if saved else FX_ENTITIES_DEFAULT
+
+
+@router.post("/fx-entities")
+def add_fx_entity(entity: dict = Body(...)):
+    items = store.load("fx_entities") or list(FX_ENTITIES_DEFAULT)
+    items.append({
+        "key": (entity.get("key") or entity.get("name") or "").strip(),
+        "name": (entity.get("name") or "").strip(),
+        "cur": (entity.get("cur") or "").strip().upper(),
+        "symbol": (entity.get("symbol") or "").strip(),
+    })
+    store.save("fx_entities", items)
+    return items
+
+
+@router.delete("/fx-entities/{key}")
+def del_fx_entity(key: str):
+    items = store.load("fx_entities") or list(FX_ENTITIES_DEFAULT)
+    items = [e for e in items if e.get("key") != key]
+    store.save("fx_entities", items)
+    return items
+
+
 def _is_agg(name: str) -> bool:
     n = name.strip().lower()
     return (n.startswith("total") or "consolidation" in n or "head office" in n
