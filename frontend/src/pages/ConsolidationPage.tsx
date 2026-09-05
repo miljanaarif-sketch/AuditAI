@@ -121,6 +121,17 @@ function colKind(label: string): 'scope' | 'subtotal' | 'entity' {
   return 'entity'
 }
 
+// consolidation roll-up scopes, in drill-down order
+const SCOPE_ORDER = [
+  'OIG Consolidation',
+  'OIC Consolidation',
+  'ODS Consolidation',
+  'OIG Zakat Consolidation (100%-owned)',
+  'OIG Zakat Consolidation (OIG separate)',
+  'OIG Standalone',
+  'OTF Consolidation (OTF & OTS)',
+]
+
 // deterministic synthetic prior-year factor (0.85–1.05) so 2024 comparatives tie within a statement
 export function priorFactor(key: string): number {
   let h = 0
@@ -290,7 +301,7 @@ export default function ConsolidationPage({ embedded = false }: { embedded?: boo
   }, [])
 
   const scopeOptions = useMemo(
-    () => (isWs ? isWs.columns.map((label, idx) => ({ label, idx })).filter((o) => colKind(o.label) === 'scope') : []),
+    () => (isWs ? SCOPE_ORDER.map((label) => ({ label, idx: isWs.columns.indexOf(label) })).filter((o) => o.idx >= 0) : []),
     [isWs],
   )
   const scopeColIdx = isWs ? isWs.columns.indexOf(scope) : -1
